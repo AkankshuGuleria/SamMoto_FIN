@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings — SamMoto Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+    <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
+    <div></div>
+    <div class="nav-right">
+        <span style="color:var(--accent);font-size:0.82rem;font-weight:600">ADMIN</span>
+        <button onclick="Auth.logout()" class="btn-nav outline">Logout</button>
+    </div>
+</nav>
+
+<!-- Status Update Modal -->
+<div class="modal-overlay" id="status-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Update Booking</h3>
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1.25rem">Booking: <strong id="modal-code"></strong></p>
+        <div class="input-group">
+            <label>Status</label>
+            <select id="modal-status">
+                <option>Pending</option><option>Confirmed</option>
+                <option>In Progress</option><option>Completed</option><option>Cancelled</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Assign Mechanic</label>
+            <select id="modal-mechanic"><option value="">— Unassigned —</option></select>
+        </div>
+        <div style="display:flex;gap:0.75rem;margin-top:1rem">
+            <button class="btn btn-secondary" style="flex:1" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" style="flex:1" onclick="saveStatus()"><i class="fas fa-save"></i> Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="dash-layout">
+    <aside class="dash-sidebar">
+        <div class="logo">SAM<span>MOTO</span></div>
+        <div class="sidebar-section">Overview</div>
+        <a href="/admindashboard.html" class="sidebar-link"><i class="fas fa-gauge"></i> Dashboard</a>
+        <div class="sidebar-section">Manage</div>
+        <a href="/admin_bookings.html" class="sidebar-link active"><i class="fas fa-calendar-check"></i> Bookings</a>
+        <a href="/admin_spares.html" class="sidebar-link"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+        <a href="/admin_mechanics.html" class="sidebar-link"><i class="fas fa-users-gear"></i> Mechanics</a>
+        <a href="#" class="sidebar-link" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </aside>
+
+    <main class="dash-main">
+        <div class="dash-header"><h1>Bookings</h1><p>Manage all service bookings</p></div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;align-items:center">
+            <select id="filter-status" onchange="applyFilter()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-size:0.85rem;outline:none">
+                <option value="all">All Status</option>
+                <option>Pending</option><option>Confirmed</option><option>In Progress</option><option>Completed</option><option>Cancelled</option>
+            </select>
+            <div style="position:relative;flex:1;min-width:200px">
+                <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.82rem"></i>
+                <input type="text" id="search" placeholder="Search code, customer, bike..." oninput="applyFilter()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px 8px 36px;border-radius:var(--radius);font-size:0.85rem;outline:none">
+            </div>
+            <span id="count-label" style="font-size:0.82rem;color:var(--muted)"></span>
+        </div>
+
+        <div class="table-section">
+            <div id="bookings-table"><div class="loading-center"><div class="spinner"></div></div></div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/auth.js"></script>
+<script src="/js/main.js"></script>
+<script>
+if (!Auth.requireRole('admin')) {}
+
+let allBookings = [], mechanics = [], editingId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await Promise.all([loadBookings(), loadMechanics()]);
+});
+
+async function loadBookings() {
+    try {
+        const res = await fetch('/api/bookings/all', { headers: Auth.getAuthHeader() });
+        allBookings = await res.json();
+        applyFilter();
+    } catch (err) {
+        document.getElementById('bookings-table').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation"></i><h3>Failed to load</h3></div>';
+    }
+}
+
+async function loadMechanics() {
+    try {
+        const res = await fetch('/api/mechanics', { headers: Auth.getAuthHeader() });
+        mechanics = await res.json();
+        const sel = document.getElementById('modal-mechanic');
+        mechanics.forEach(m => sel.innerHTML += `<option value="${m._id}">${m.name} (${m.specialization})</option>`);
+    } catch (_) {}
+}
+
+function applyFilter() {
+    const status = document.getElementById('filter-status').value;
+    const query = document.getElementById('search').value.toLowerCase();
+    let list = allBookings;
+    if (status !== 'all') list = list.filter(b => b.status === status);
+    if (query) list = list.filter(b =>
+        b.bookingCode?.toLowerCase().includes(query) ||
+        b.customerName?.toLowerCase().includes(query) ||
+        b.bikeModel?.toLowerCase().includes(query) ||
+        b.registrationNumber?.toLowerCase().includes(query)
+    );
+    document.getElementById('count-label').textContent = `${list.length} booking${list.length !== 1 ? 's' : ''}`;
+    renderTable(list);
+}
+
+function renderTable(list) {
+    const el = document.getElementById('bookings-table');
+    if (!list.length) {
+        el.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-xmark"></i><h3>No bookings found</h3></div>';
+        return;
+    }
+    const sb = s => { const m={Pending:'pending',Confirmed:'confirmed','In Progress':'progress',Completed:'completed',Cancelled:'cancelled'}; return `<span class="badge badge-${m[s]||'pending'}">${s}</span>`; };
+    const pb = s => `<span class="badge badge-${s==='Paid'?'paid':'unpaid'}">${s}</span>`;
+
+    el.innerHTML = `
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr><th>Code</th><th>Customer</th><th>Bike</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th><th>Payment</th><th>Action</th></tr></thead>
+                <tbody>${list.map(b => `
+                    <tr>
+                        <td style="font-family:monospace;color:var(--accent);font-size:0.82rem">${b.bookingCode}</td>
+                        <td><div style="font-weight:500">${b.customerName||'—'}</div><div style="font-size:0.76rem;color:var(--muted)">${b.customerPhone||''}</div></td>
+                        <td><div>${b.bikeModel}</div><div style="font-size:0.76rem;color:var(--muted)">${b.registrationNumber}</div></td>
+                        <td style="font-size:0.85rem">${b.serviceType}</td>
+                        <td style="font-size:0.82rem">${new Date(b.serviceDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})}</td>
+                        <td style="font-weight:600">₹${(b.totalAmount||0).toLocaleString('en-IN')}</td>
+                        <td>${sb(b.status)}</td>
+                        <td>${pb(b.paymentStatus)}</td>
+                        <td><button class="btn btn-secondary btn-sm" onclick="openModal('${b._id}','${b.bookingCode}','${b.status}','${b.mechanic?._id||''}')"><i class="fas fa-edit"></i></button></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+function openModal(id, code, status, mechanicId) {
+    editingId = id;
+    document.getElementById('modal-code').textContent = code;
+    document.getElementById('modal-status').value = status;
+    document.getElementById('modal-mechanic').value = mechanicId || '';
+    document.getElementById('status-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('status-modal').classList.remove('open'); editingId = null; }
+
+async function saveStatus() {
+    const status = document.getElementById('modal-status').value;
+    const mechanic = document.getElementById('modal-mechanic').value;
+    try {
+        const res = await fetch(`/api/bookings/${editingId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
+            body: JSON.stringify({ status, mechanic: mechanic || undefined })
+        });
+        if (!res.ok) { showToast('Update failed.', 'error'); return; }
+        showToast('Booking updated!', 'success');
+        closeModal();
+        await loadBookings();
+    } catch (err) { showToast('Error updating booking.', 'error'); }
+}
+</script>
+</body>
+</html>

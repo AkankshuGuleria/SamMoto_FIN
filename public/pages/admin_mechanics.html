@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanics — SamMoto Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+    <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
+    <div></div>
+    <div class="nav-right">
+        <span style="color:var(--accent);font-size:0.82rem;font-weight:600">ADMIN</span>
+        <button onclick="Auth.logout()" class="btn-nav outline">Logout</button>
+    </div>
+</nav>
+
+<!-- Mechanic Modal -->
+<div class="modal-overlay" id="mech-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-title">Add Mechanic</h3>
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="form-row">
+            <div class="input-group"><label>Full Name</label><input type="text" id="m-name" placeholder="Mechanic name"></div>
+            <div class="input-group"><label>Phone</label><input type="tel" id="m-phone" placeholder="+91 XXXXX XXXXX"></div>
+        </div>
+        <div class="input-group"><label>Email (optional)</label><input type="email" id="m-email" placeholder="mechanic@sammoto.in"></div>
+        <div class="form-row">
+            <div class="input-group">
+                <label>Specialization</label>
+                <select id="m-spec">
+                    <option>General</option><option>Engine</option><option>Electrical</option>
+                    <option>Tyres & Brakes</option><option>Suspension</option><option>Bodywork</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Experience (years)</label>
+                <input type="number" id="m-exp" min="0" max="50" placeholder="3">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-group">
+                <label>Status</label>
+                <select id="m-status"><option>Available</option><option>Busy</option><option>Off Duty</option></select>
+            </div>
+            <div class="input-group">
+                <label>Rating (1-5)</label>
+                <input type="number" id="m-rating" min="1" max="5" step="0.1" placeholder="4.5">
+            </div>
+        </div>
+        <div style="display:flex;gap:0.75rem;margin-top:1rem">
+            <button class="btn btn-secondary" style="flex:1" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" style="flex:1" id="save-btn" onclick="saveMechanic()"><i class="fas fa-save"></i> Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="dash-layout">
+    <aside class="dash-sidebar">
+        <div class="logo">SAM<span>MOTO</span></div>
+        <div class="sidebar-section">Overview</div>
+        <a href="/admindashboard.html" class="sidebar-link"><i class="fas fa-gauge"></i> Dashboard</a>
+        <div class="sidebar-section">Manage</div>
+        <a href="/admin_bookings.html" class="sidebar-link"><i class="fas fa-calendar-check"></i> Bookings</a>
+        <a href="/admin_spares.html" class="sidebar-link"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+        <a href="/admin_mechanics.html" class="sidebar-link active"><i class="fas fa-users-gear"></i> Mechanics</a>
+        <a href="#" class="sidebar-link" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </aside>
+
+    <main class="dash-main">
+        <div class="dash-header"><h1>Mechanics</h1><p>Manage your workshop team</p></div>
+
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-user-plus"></i> Add Mechanic</button>
+            <select id="filter-status" onchange="applyFilter()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-size:0.85rem;outline:none">
+                <option value="all">All Status</option>
+                <option>Available</option><option>Busy</option><option>Off Duty</option>
+            </select>
+            <span id="count-label" style="font-size:0.82rem;color:var(--muted)"></span>
+        </div>
+
+        <div id="mechanics-grid" class="grid-3">
+            <div class="loading-center" style="grid-column:1/-1"><div class="spinner"></div></div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/auth.js"></script>
+<script src="/js/main.js"></script>
+<script>
+if (!Auth.requireRole('admin')) {}
+
+let allMechanics = [], editingId = null;
+
+document.addEventListener('DOMContentLoaded', loadMechanics);
+
+async function loadMechanics() {
+    try {
+        const res = await fetch('/api/mechanics', { headers: Auth.getAuthHeader() });
+        allMechanics = await res.json();
+        applyFilter();
+    } catch (err) {
+        document.getElementById('mechanics-grid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-exclamation"></i><h3>Failed to load</h3></div>';
+    }
+}
+
+function applyFilter() {
+    const s = document.getElementById('filter-status').value;
+    const list = s === 'all' ? allMechanics : allMechanics.filter(m => m.status === s);
+    document.getElementById('count-label').textContent = `${list.length} mechanic${list.length !== 1 ? 's' : ''}`;
+    renderCards(list);
+}
+
+function renderCards(list) {
+    const el = document.getElementById('mechanics-grid');
+    if (!list.length) { el.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-users-gear"></i><h3>No mechanics found</h3></div>'; return; }
+
+    const statusColor = { Available: 'var(--success)', Busy: 'var(--warning)', 'Off Duty': 'var(--muted)' };
+    const stars = r => Array.from({length:5},(_,i) => `<i class="fas fa-star" style="font-size:0.75rem;color:${i<Math.round(r)?'var(--warning)':'var(--muted2)'}"></i>`).join('');
+
+    el.innerHTML = list.map(m => `
+        <div class="card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <div style="width:46px;height:46px;background:rgba(230,57,70,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:var(--accent)">${m.name.charAt(0)}</div>
+                    <div>
+                        <div style="font-weight:600">${m.name}</div>
+                        <div style="font-size:0.78rem;color:var(--muted)">${m.specialization}</div>
+                    </div>
+                </div>
+                <span style="font-size:0.75rem;font-weight:600;color:${statusColor[m.status]||'var(--muted)'};background:rgba(255,255,255,0.04);border:1px solid currentColor;padding:3px 8px;border-radius:999px">${m.status}</span>
+            </div>
+            <div style="font-size:0.83rem;color:var(--muted);margin-bottom:0.5rem"><i class="fas fa-phone" style="width:14px"></i> ${m.phone}</div>
+            ${m.email ? `<div style="font-size:0.83rem;color:var(--muted);margin-bottom:0.5rem"><i class="fas fa-envelope" style="width:14px"></i> ${m.email}</div>` : ''}
+            <div style="font-size:0.83rem;color:var(--muted);margin-bottom:1rem"><i class="fas fa-briefcase" style="width:14px"></i> ${m.experience} yr${m.experience !== 1 ? 's' : ''} experience</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:1.25rem">${stars(m.rating)} <span style="font-size:0.8rem;color:var(--muted)">${m.rating}</span></div>
+            <div style="display:flex;gap:0.5rem">
+                <button class="btn btn-secondary btn-sm" style="flex:1" onclick="openEditModal('${m._id}')"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteMechanic('${m._id}','${m.name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>`).join('');
+}
+
+function openAddModal() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Add Mechanic';
+    ['m-name','m-phone','m-email'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('m-spec').value = 'General';
+    document.getElementById('m-exp').value = '';
+    document.getElementById('m-status').value = 'Available';
+    document.getElementById('m-rating').value = '4.5';
+    document.getElementById('mech-modal').classList.add('open');
+}
+
+function openEditModal(id) {
+    const m = allMechanics.find(x => x._id === id);
+    if (!m) return;
+    editingId = id;
+    document.getElementById('modal-title').textContent = 'Edit Mechanic';
+    document.getElementById('m-name').value = m.name;
+    document.getElementById('m-phone').value = m.phone;
+    document.getElementById('m-email').value = m.email || '';
+    document.getElementById('m-spec').value = m.specialization;
+    document.getElementById('m-exp').value = m.experience;
+    document.getElementById('m-status').value = m.status;
+    document.getElementById('m-rating').value = m.rating;
+    document.getElementById('mech-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('mech-modal').classList.remove('open'); editingId = null; }
+
+async function saveMechanic() {
+    const payload = {
+        name: document.getElementById('m-name').value.trim(),
+        phone: document.getElementById('m-phone').value.trim(),
+        email: document.getElementById('m-email').value.trim(),
+        specialization: document.getElementById('m-spec').value,
+        experience: parseInt(document.getElementById('m-exp').value) || 1,
+        status: document.getElementById('m-status').value,
+        rating: parseFloat(document.getElementById('m-rating').value) || 4.5
+    };
+    if (!payload.name || !payload.phone) { showToast('Name and phone are required.', 'error'); return; }
+
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+        const url = editingId ? `/api/mechanics/${editingId}` : '/api/mechanics';
+        const method = editingId ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, headers: { 'Content-Type':'application/json', ...Auth.getAuthHeader() }, body: JSON.stringify(payload) });
+        if (!res.ok) { showToast('Save failed.', 'error'); return; }
+        showToast(editingId ? 'Mechanic updated!' : 'Mechanic added!', 'success');
+        closeModal();
+        await loadMechanics();
+    } catch (_) { showToast('Network error.', 'error'); }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save'; }
+}
+
+async function deleteMechanic(id, name) {
+    if (!confirm(`Remove "${name}" from the team?`)) return;
+    try {
+        const res = await fetch(`/api/mechanics/${id}`, { method: 'DELETE', headers: Auth.getAuthHeader() });
+        if (res.ok) { showToast('Mechanic removed.', 'success'); await loadMechanics(); }
+        else showToast('Delete failed.', 'error');
+    } catch (_) { showToast('Network error.', 'error'); }
+}
+</script>
+</body>
+</html>

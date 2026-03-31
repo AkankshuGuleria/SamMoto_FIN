@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Service — SamMoto</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
+        <ul class="nav-links" id="nav-links"></ul>
+        <div class="nav-right" id="nav-right"></div>
+    </nav>
+
+    <div class="booking-page">
+        <div class="booking-container">
+            <h2>Schedule a <span class="text-accent">Service</span></h2>
+            <p class="sub">Fill in your details and we'll confirm your slot.</p>
+
+            <div class="booking-steps">
+                <div class="step-dot active" id="step1-dot"></div>
+                <div class="step-dot" id="step2-dot"></div>
+                <div class="step-dot" id="step3-dot"></div>
+            </div>
+
+            <!-- Step 1: Vehicle -->
+            <div id="step1">
+                <div class="booking-section">
+                    <h4><i class="fas fa-motorcycle text-accent"></i> &nbsp; Vehicle Details</h4>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Bike Model</label>
+                            <select id="bikeModel">
+                                <option value="" disabled selected>Select your bike</option>
+                                <optgroup label="Royal Enfield">
+                                    <option>RE Classic 350</option>
+                                    <option>RE Bullet 350</option>
+                                    <option>RE Meteor 350</option>
+                                    <option>RE Hunter 350</option>
+                                    <option>RE Himalayan 450</option>
+                                    <option>RE Interceptor 650</option>
+                                </optgroup>
+                                <optgroup label="KTM">
+                                    <option>KTM Duke 125</option>
+                                    <option>KTM Duke 200</option>
+                                    <option>KTM Duke 390</option>
+                                    <option>KTM RC 390</option>
+                                </optgroup>
+                                <optgroup label="Bajaj">
+                                    <option>Bajaj Pulsar 150</option>
+                                    <option>Bajaj Pulsar NS200</option>
+                                    <option>Bajaj Dominar 400</option>
+                                </optgroup>
+                                <optgroup label="Yamaha">
+                                    <option>Yamaha R15 V4</option>
+                                    <option>Yamaha MT-15 V2</option>
+                                    <option>Yamaha FZ-S FI</option>
+                                    <option>Yamaha FZ25</option>
+                                </optgroup>
+                                <optgroup label="TVS">
+                                    <option>TVS Apache RTR 160 4V</option>
+                                    <option>TVS Apache RTR 200 4V</option>
+                                    <option>TVS Apache RR 310</option>
+                                </optgroup>
+                                <optgroup label="Honda">
+                                    <option>Honda Activa 6G</option>
+                                    <option>Honda Activa 125</option>
+                                    <option>Honda CB300R</option>
+                                    <option>Honda Hness CB350</option>
+                                </optgroup>
+                                <optgroup label="Hero">
+                                    <option>Hero Splendor Plus</option>
+                                    <option>Hero Xtreme 160R</option>
+                                    <option>Hero Xpulse 200 4V</option>
+                                </optgroup>
+                                <optgroup label="Suzuki">
+                                    <option>Suzuki Gixxer</option>
+                                    <option>Suzuki Gixxer SF</option>
+                                    <option>Suzuki Access 125</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Registration Number</label>
+                            <input type="text" id="regNumber" placeholder="PB-10-XXXX" style="text-transform:uppercase">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-section">
+                    <h4><i class="fas fa-wrench text-accent"></i> &nbsp; Service Details</h4>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Service Type</label>
+                            <select id="serviceType">
+                                <option value="" disabled selected>Choose service</option>
+                                <option>General Service</option>
+                                <option>Engine Repair</option>
+                                <option>Tyre & Brake Service</option>
+                                <option>Electrical & Wiring</option>
+                                <option>Suspension Service</option>
+                                <option>Bodywork & Paint</option>
+                                <option>Oil Change Only</option>
+                                <option>Full Overhaul</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Preferred Date</label>
+                            <input type="date" id="serviceDate">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Preferred Time Slot</label>
+                        <select id="serviceTime">
+                            <option value="09:00">9:00 AM</option>
+                            <option value="10:00" selected>10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Additional Notes (optional)</label>
+                        <textarea id="notes" placeholder="Describe any specific issues or requests..."></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="goStep2()">
+                    Next: Review Cart <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Step 2: Cart Review -->
+            <div id="step2" class="hidden">
+                <div class="booking-section">
+                    <h4><i class="fas fa-shopping-cart text-accent"></i> &nbsp; Items in your Job Card</h4>
+                    <div id="cart-review"></div>
+                    <a href="/shop.html"
+                        style="font-size:0.85rem;color:var(--accent);display:inline-flex;align-items:center;gap:6px;margin-top:0.75rem">
+                        <i class="fas fa-plus"></i> Add more from shop
+                    </a>
+                </div>
+                <div class="booking-section">
+                    <h4><i class="fas fa-receipt text-accent"></i> &nbsp; Cost Summary</h4>
+                    <div class="summary-row"><span class="label" style="color:var(--muted)">Parts &
+                            Accessories</span><span id="parts-cost">₹0.00</span></div>
+                    <div class="summary-row"><span class="label" style="color:var(--muted)">Labour &
+                            Services</span><span id="labour-cost">₹0.00</span></div>
+                    <div class="summary-row total mt-2" style="font-size:1.1rem"><span>Total</span><span
+                            class="text-accent" id="total-cost">₹0.00</span></div>
+                </div>
+                <div style="display:flex;gap:1rem">
+                    <button class="btn btn-secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i>
+                        Back</button>
+                    <button class="btn btn-primary" onclick="goStep3()">Confirm & Pay <i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: Confirm & Pay -->
+            <div id="step3" class="hidden">
+                <div class="booking-section">
+                    <h4><i class="fas fa-check-circle text-accent"></i> &nbsp; Booking Summary</h4>
+                    <div id="booking-summary" style="font-size:0.9rem;line-height:2"></div>
+                </div>
+                <div class="booking-section">
+                    <h4><i class="fas fa-credit-card text-accent"></i> &nbsp; Payment</h4>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+                        <button id="pay-online-btn" class="btn btn-primary" onclick="payOnline()">
+                            <i class="fas fa-mobile-alt"></i> Pay Online (Razorpay)
+                        </button>
+                        <button id="pay-later-btn" class="btn btn-secondary" onclick="bookNow('pay_later')">
+                            <i class="fas fa-store"></i> Pay at Workshop
+                        </button>
+                    </div>
+                    <p style="font-size:0.78rem;color:var(--muted);margin-top:0.75rem">
+                        <i class="fas fa-shield-halved text-accent"></i> Payments secured by Razorpay. Your data is
+                        safe.
+                    </p>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="goStep(2)"><i class="fas fa-arrow-left"></i>
+                    Back</button>
+            </div>
+
+            <!-- Success -->
+            <div id="step-success" class="hidden booking-section" style="text-align:center;padding:3rem">
+                <div style="font-size:3.5rem;color:var(--success);margin-bottom:1rem"><i
+                        class="fas fa-check-circle"></i></div>
+                <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:0.5rem">Booking Confirmed!</h3>
+                <p style="color:var(--muted);margin-bottom:1rem">Your booking code: <strong id="booking-code"
+                        class="text-accent"></strong></p>
+                <p style="color:var(--muted);font-size:0.88rem;margin-bottom:2rem">We'll call you to confirm the slot.
+                    See you soon!</p>
+                <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+                    <a href="/cust_dashboard.html" class="btn btn-primary">My Bookings</a>
+                    <a href="/index.html" class="btn btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Require login
+        if (!Auth.requireAuth()) { }
+
+        // Set minimum date to tomorrow
+        const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('serviceDate').min = tomorrow.toISOString().split('T')[0];
+
+        function getCart() { return JSON.parse(localStorage.getItem('sm_cart') || '[]'); }
+
+        function goStep(n) {
+            [1, 2, 3].forEach(i => {
+                document.getElementById(`step${i}`).classList.toggle('hidden', i !== n);
+                document.getElementById(`step${i}-dot`).classList.toggle('active', i <= n);
+            });
+        }
+
+        function goStep2() {
+            if (!document.getElementById('bikeModel').value) { showToast('Please select your bike model.', 'error'); return; }
+            if (!document.getElementById('regNumber').value.trim()) { showToast('Please enter your registration number.', 'error'); return; }
+            if (!document.getElementById('serviceType').value) { showToast('Please select a service type.', 'error'); return; }
+            if (!document.getElementById('serviceDate').value) { showToast('Please choose a service date.', 'error'); return; }
+            renderCartReview();
+            goStep(2);
+        }
+
+        function renderCartReview() {
+            const cart = getCart();
+            const el = document.getElementById('cart-review');
+            if (cart.length === 0) {
+                el.innerHTML = `<p style="color:var(--muted);font-size:0.88rem">No items added. You can add spare parts from the shop.</p>`;
+            } else {
+                el.innerHTML = cart.map(i => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <i class="fas ${i.icon || 'fa-box'}" style="color:var(--accent)"></i>
+                    <span style="font-size:0.9rem">${i.name} <span style="color:var(--muted)">x${i.qty || 1}</span></span>
+                </div>
+                <span style="font-weight:600">₹${(parseFloat(i.price) * (i.qty || 1)).toFixed(2)}</span>
+            </div>`).join('');
+            }
+
+            let partsCost = 0, laborCost = 0;
+            cart.forEach(i => {
+                const p = parseFloat(i.price) * (i.qty || 1);
+                if (i.type === 'part') partsCost += p; else laborCost += p;
+            });
+            document.getElementById('parts-cost').textContent = `₹${partsCost.toFixed(2)}`;
+            document.getElementById('labour-cost').textContent = `₹${laborCost.toFixed(2)}`;
+            document.getElementById('total-cost').textContent = `₹${(partsCost + laborCost).toFixed(2)}`;
+        }
+
+        function goStep3() {
+            const cart = getCart();
+            let partsCost = 0, laborCost = 0;
+            cart.forEach(i => { const p = parseFloat(i.price) * (i.qty || 1); if (i.type === 'part') partsCost += p; else laborCost += p; });
+            const total = partsCost + laborCost;
+
+            document.getElementById('booking-summary').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+            <span style="color:var(--muted)">Bike</span><span>${document.getElementById('bikeModel').value}</span>
+            <span style="color:var(--muted)">Reg. No.</span><span>${document.getElementById('regNumber').value.toUpperCase()}</span>
+            <span style="color:var(--muted)">Service</span><span>${document.getElementById('serviceType').value}</span>
+            <span style="color:var(--muted)">Date</span><span>${(() => { const [y, m, d] = document.getElementById('serviceDate').value.split('-'); return new Date(+y, +m - 1, +d).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }); })()}</span>
+            <span style="color:var(--muted)">Time</span><span>${document.getElementById('serviceTime').value}</span>
+            <span style="color:var(--muted)">Total</span><span class="text-accent" style="font-weight:700">₹${total.toFixed(2)}</span>
+        </div>`;
+            goStep(3);
+        }
+
+        function buildPayload() {
+            const cart = getCart();
+            let partsCost = 0, laborCost = 0;
+            cart.forEach(i => { const p = parseFloat(i.price) * (i.qty || 1); if (i.type === 'part') partsCost += p; else laborCost += p; });
+            return {
+                bikeModel: document.getElementById('bikeModel').value,
+                registrationNumber: document.getElementById('regNumber').value.toUpperCase(),
+                serviceType: document.getElementById('serviceType').value,
+                serviceDate: document.getElementById('serviceDate').value,
+                serviceTime: document.getElementById('serviceTime').value,
+                notes: document.getElementById('notes').value,
+                items: cart,
+                subtotal: partsCost,
+                laborCost: laborCost,
+                totalAmount: partsCost + laborCost
+            };
+        }
+
+        async function bookNow(paymentMode) {
+            const btn = paymentMode === 'pay_later' ? document.getElementById('pay-later-btn') : document.getElementById('pay-online-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const res = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
+                    body: JSON.stringify(buildPayload())
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) { showToast(data.message || 'Booking failed.', 'error'); return; }
+
+                localStorage.removeItem('sm_cart');
+                updateCartBadge();
+                document.getElementById('booking-code').textContent = data.booking.bookingCode;
+                [1, 2, 3].forEach(i => { document.getElementById(`step${i}`).classList.add('hidden'); document.getElementById(`step${i}-dot`).classList.add('active'); });
+                document.getElementById('step-success').classList.remove('hidden');
+            } catch (err) {
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function payOnline() {
+            const payload = buildPayload();
+            const btn = document.getElementById('pay-online-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening payment...';
+
+            try {
+                // Create booking first
+                const bRes = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
+                    body: JSON.stringify(payload)
+                });
+                const bData = await bRes.json();
+                if (!bRes.ok) { showToast(bData.message || 'Booking error.', 'error'); return; }
+
+                const bookingId = bData.booking._id;
+                const total = payload.totalAmount;
+
+                if (total <= 0) { await completeBooking(bookingId, null, null); return; }
+
+                // Create Razorpay order
+                const oRes = await fetch('/api/payments/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
+                    body: JSON.stringify({ amount: total, bookingId })
+                });
+                const oData = await oRes.json();
+                if (!oRes.ok) { showToast('Payment gateway error. Pay at workshop instead.', 'error'); return; }
+
+                const auth = Auth.getAuth();
+                const options = {
+                    key: oData.keyId,
+                    amount: oData.amount,
+                    currency: oData.currency,
+                    name: 'SamMoto',
+                    description: payload.serviceType,
+                    order_id: oData.orderId,
+                    prefill: { name: auth.name, email: auth.email },
+                    theme: { color: '#e63946' },
+                    handler: async (response) => {
+                        // Verify payment
+                        await fetch('/api/payments/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
+                            body: JSON.stringify(response)
+                        });
+                        await completeBooking(bookingId, response.razorpay_payment_id, oData.orderId);
+                    }
+                };
+                new Razorpay(options).open();
+            } catch (err) {
+                showToast('Payment error. Try paying at the workshop.', 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Pay Online (Razorpay)';
+            }
+        }
+
+        async function completeBooking(bookingId, paymentId, orderId) {
+            if (paymentId) {
+                await fetch(`/api/bookings/${bookingId}/payment`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
+                    body: JSON.stringify({ razorpayPaymentId: paymentId, razorpayOrderId: orderId })
+                });
+            }
+            localStorage.removeItem('sm_cart');
+            updateCartBadge();
+            const bData = await fetch(`/api/bookings/${bookingId}`, { headers: Auth.getAuthHeader() }).then(r => r.json());
+            document.getElementById('booking-code').textContent = bData.bookingCode || 'SM-XXXX';
+            [1, 2, 3].forEach(i => { document.getElementById(`step${i}`).classList.add('hidden'); });
+            document.getElementById('step-success').classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

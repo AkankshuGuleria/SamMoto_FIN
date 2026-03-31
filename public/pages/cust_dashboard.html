@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Garage — SamMoto</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+    <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <div class="nav-right" id="nav-right"></div>
+</nav>
+
+<div class="dash-layout">
+    <aside class="dash-sidebar">
+        <div class="logo">SAM<span>MOTO</span></div>
+        <div class="sidebar-section">Menu</div>
+        <a href="/cust_dashboard.html" class="sidebar-link active"><i class="fas fa-gauge"></i> Dashboard</a>
+        <a href="/booking.html" class="sidebar-link"><i class="fas fa-calendar-plus"></i> Book Service</a>
+        <a href="/shop.html" class="sidebar-link"><i class="fas fa-store"></i> Shop Parts</a>
+        <a href="/cart.html" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Cart</a>
+        <div class="sidebar-section" style="margin-top:auto"></div>
+        <a href="#" class="sidebar-link" id="sos-btn" style="color:var(--accent)"><i class="fas fa-phone"></i> SOS Roadside</a>
+        <a href="#" class="sidebar-link" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <div class="sidebar-user">
+            <div class="name" id="user-name">Loading...</div>
+            <div class="role">Customer</div>
+        </div>
+    </aside>
+
+    <main class="dash-main">
+        <div class="dash-header">
+            <h1>My Garage</h1>
+            <p>Track your bookings and service history</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Total Bookings</div>
+                <div class="value" id="stat-total">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Completed</div>
+                <div class="value green" id="stat-completed">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Pending / In Progress</div>
+                <div class="value orange" id="stat-active">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Spent</div>
+                <div class="value accent" id="stat-spent">—</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap">
+            <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> New Booking</a>
+            <a href="/shop.html" class="btn btn-secondary"><i class="fas fa-store"></i> Shop Parts</a>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="table-section">
+            <div class="table-section-header">
+                <h3>My Bookings</h3>
+                <div style="display:flex;gap:0.5rem">
+                    <select id="status-filter" onchange="filterBookings()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius);font-size:0.82rem;outline:none">
+                        <option value="all">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div id="bookings-list"><div class="loading-center"><div class="spinner"></div></div></div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/auth.js"></script>
+<script src="/js/main.js"></script>
+<script>
+if (!Auth.requireRole('customer')) {}
+
+let allBookings = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const auth = Auth.getAuth();
+    document.getElementById('user-name').textContent = auth.name || 'Customer';
+
+    document.getElementById('sos-btn').addEventListener('click', e => {
+        e.preventDefault();
+        if (confirm('Call SamMoto Roadside Assistance?\n+91 98765 43210')) window.location.href = 'tel:+919876543210';
+    });
+
+    await loadBookings();
+});
+
+async function loadBookings() {
+    try {
+        const res = await fetch('/api/bookings/history', { headers: Auth.getAuthHeader() });
+        if (res.status === 401) { Auth.logout(); return; }
+        allBookings = await res.json();
+
+        // Stats
+        const completed = allBookings.filter(b => b.status === 'Completed').length;
+        const active = allBookings.filter(b => ['Pending','Confirmed','In Progress'].includes(b.status)).length;
+        const spent = allBookings.filter(b => b.paymentStatus === 'Paid').reduce((s, b) => s + (b.totalAmount || 0), 0);
+
+        document.getElementById('stat-total').textContent = allBookings.length;
+        document.getElementById('stat-completed').textContent = completed;
+        document.getElementById('stat-active').textContent = active;
+        document.getElementById('stat-spent').textContent = '₹' + spent.toLocaleString('en-IN');
+
+        renderBookings(allBookings);
+    } catch (err) {
+        document.getElementById('bookings-list').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation"></i><h3>Failed to load bookings</h3></div>';
+    }
+}
+
+function filterBookings() {
+    const filter = document.getElementById('status-filter').value;
+    const filtered = filter === 'all' ? allBookings : allBookings.filter(b => b.status === filter);
+    renderBookings(filtered);
+}
+
+function renderBookings(list) {
+    const el = document.getElementById('bookings-list');
+    if (!list.length) {
+        el.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-xmark"></i><h3>No bookings found</h3><p>Book your first service to get started.</p><a href="/booking.html" class="btn btn-primary mt-3">Book Now</a></div>`;
+        return;
+    }
+
+    const statusBadge = s => {
+        const map = { Pending:'pending', Confirmed:'confirmed', 'In Progress':'progress', Completed:'completed', Cancelled:'cancelled' };
+        return `<span class="badge badge-${map[s]||'pending'}">${s}</span>`;
+    };
+    const payBadge = s => `<span class="badge badge-${s==='Paid'?'paid':'unpaid'}">${s}</span>`;
+
+    el.innerHTML = `
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr>
+                    <th>Booking Code</th><th>Bike</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th><th>Payment</th>
+                </tr></thead>
+                <tbody>${list.map(b => `
+                    <tr>
+                        <td style="font-family:monospace;font-size:0.85rem;color:var(--accent)">${b.bookingCode}</td>
+                        <td><div style="font-weight:500">${b.bikeModel}</div><div style="font-size:0.78rem;color:var(--muted)">${b.registrationNumber}</div></td>
+                        <td>${b.serviceType}</td>
+                        <td style="font-size:0.85rem">${new Date(b.serviceDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+                        <td style="font-weight:600">₹${(b.totalAmount||0).toLocaleString('en-IN')}</td>
+                        <td>${statusBadge(b.status)}</td>
+                        <td>${payBadge(b.paymentStatus)}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+</script>
+</body>
+</html>

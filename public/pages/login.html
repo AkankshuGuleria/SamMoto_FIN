@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — SamMoto</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
+        <div></div>
+        <div class="nav-right">
+            <a href="/signup.html" class="btn-nav outline">Create Account</a>
+        </div>
+    </nav>
+
+    <div class="form-page">
+        <div class="form-box">
+            <h2>Welcome Back</h2>
+            <p class="sub">Login to your SamMoto account</p>
+
+            <div class="alert alert-danger" id="error-msg"></div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+                    <button class="eye-btn" id="toggle-eye" tabindex="-1"><i class="fas fa-eye"
+                            id="eye-icon"></i></button>
+                </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+                <label
+                    style="display:flex;align-items:center;gap:8px;font-size:0.84rem;color:var(--muted);cursor:pointer">
+                    <input type="checkbox" id="remember" style="accent-color:var(--accent)"> Remember me
+                </label>
+                <a href="#" style="font-size:0.84rem;color:var(--accent)">Forgot password?</a>
+            </div>
+
+            <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <div class="form-footer">
+                Don't have an account? <a href="/signup.html">Sign up free</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        // Redirect if already logged in
+        const _a = Auth.getAuth();
+        if (_a.loggedIn) window.location.replace(_a.role === 'admin' ? '/admindashboard.html' : '/cust_dashboard.html');
+
+        document.getElementById('toggle-eye').addEventListener('click', () => {
+            const pw = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+            icon.className = pw.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        });
+
+        document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errEl = document.getElementById('error-msg');
+            const btn = document.getElementById('login-btn');
+
+            errEl.classList.remove('show');
+
+            if (!email || !password) {
+                errEl.textContent = 'Please enter your email and password.';
+                errEl.classList.add('show'); return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    errEl.textContent = data.message || 'Invalid email or password.';
+                    errEl.classList.add('show');
+                    return;
+                }
+
+                Auth.setAuth(data);
+                window.location.replace(data.role === 'admin' ? '/admindashboard.html' : '/cust_dashboard.html');
+            } catch (err) {
+                errEl.textContent = 'Network error. Is the server running?';
+                errEl.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
+        }
+    </script>
+</body>
+
+</html>

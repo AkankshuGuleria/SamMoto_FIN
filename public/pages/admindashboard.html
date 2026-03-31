@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — SamMoto</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+    <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
+    <div></div>
+    <div class="nav-right">
+        <span style="color:var(--accent);font-size:0.82rem;font-weight:600;letter-spacing:1px">ADMIN PANEL</span>
+        <button onclick="Auth.logout()" class="btn-nav outline">Logout</button>
+    </div>
+</nav>
+
+<div class="dash-layout">
+    <aside class="dash-sidebar">
+        <div class="logo">SAM<span>MOTO</span></div>
+        <div class="sidebar-section">Overview</div>
+        <a href="/admindashboard.html" class="sidebar-link active"><i class="fas fa-gauge"></i> Dashboard</a>
+        <div class="sidebar-section">Manage</div>
+        <a href="/admin_bookings.html" class="sidebar-link"><i class="fas fa-calendar-check"></i> Bookings</a>
+        <a href="/admin_spares.html" class="sidebar-link"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+        <a href="/admin_mechanics.html" class="sidebar-link"><i class="fas fa-users-gear"></i> Mechanics</a>
+        <div class="sidebar-section">Site</div>
+        <a href="/index.html" class="sidebar-link" target="_blank"><i class="fas fa-globe"></i> View Site</a>
+        <a href="#" class="sidebar-link" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <div class="sidebar-user">
+            <div class="name" id="admin-name">Admin</div>
+            <div class="role" style="color:var(--accent)">Administrator</div>
+        </div>
+    </aside>
+
+    <main class="dash-main">
+        <div class="dash-header">
+            <h1>Dashboard</h1>
+            <p id="dash-date" style="color:var(--muted)"></p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Total Bookings</div>
+                <div class="value" id="stat-total">—</div>
+                <div class="delta">All time</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Completed</div>
+                <div class="value green" id="stat-completed">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Pending</div>
+                <div class="value orange" id="stat-pending">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">In Progress</div>
+                <div class="value blue" id="stat-progress">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Revenue</div>
+                <div class="value accent" id="stat-revenue">—</div>
+                <div class="delta">Paid bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Unique Customers</div>
+                <div class="value" id="stat-customers">—</div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap">
+            <a href="/admin_bookings.html" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Manage Bookings</a>
+            <a href="/admin_spares.html" class="btn btn-secondary"><i class="fas fa-plus"></i> Add Product</a>
+            <a href="/admin_mechanics.html" class="btn btn-secondary"><i class="fas fa-user-plus"></i> Add Mechanic</a>
+        </div>
+
+        <div class="table-section">
+            <div class="table-section-header">
+                <h3>Recent Bookings</h3>
+                <a href="/admin_bookings.html" style="font-size:0.83rem;color:var(--accent)">View all →</a>
+            </div>
+            <div id="recent-bookings"><div class="loading-center"><div class="spinner"></div></div></div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/auth.js"></script>
+<script src="/js/main.js"></script>
+<script>
+if (!Auth.requireRole('admin')) {}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('admin-name').textContent = Auth.getAuth().name || 'Admin';
+    document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    await Promise.all([loadStats(), loadRecent()]);
+});
+
+async function loadStats() {
+    try {
+        const res = await fetch('/api/bookings/stats', { headers: Auth.getAuthHeader() });
+        if (res.status === 401) { Auth.logout(); return; }
+        const s = await res.json();
+        document.getElementById('stat-total').textContent = s.total || 0;
+        document.getElementById('stat-completed').textContent = s.completed || 0;
+        document.getElementById('stat-pending').textContent = s.pending || 0;
+        document.getElementById('stat-progress').textContent = s.inProgress || 0;
+        document.getElementById('stat-revenue').textContent = '₹' + (s.revenue || 0).toLocaleString('en-IN');
+        document.getElementById('stat-customers').textContent = s.customers || 0;
+    } catch (err) { console.error(err); }
+}
+
+async function loadRecent() {
+    try {
+        const res = await fetch('/api/bookings/all', { headers: Auth.getAuthHeader() });
+        const bookings = await res.json();
+        const el = document.getElementById('recent-bookings');
+
+        if (!bookings.length) { el.innerHTML = '<div class="empty-state"><i class="fas fa-calendar"></i><h3>No bookings yet</h3></div>'; return; }
+
+        const statusBadge = s => {
+            const map = { Pending:'pending', Confirmed:'confirmed', 'In Progress':'progress', Completed:'completed', Cancelled:'cancelled' };
+            return `<span class="badge badge-${map[s]||'pending'}">${s}</span>`;
+        };
+
+        el.innerHTML = `
+            <div class="table-wrap">
+                <table class="table">
+                    <thead><tr><th>Code</th><th>Customer</th><th>Bike</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody>${bookings.slice(0,8).map(b => `
+                        <tr>
+                            <td style="font-family:monospace;color:var(--accent);font-size:0.85rem">${b.bookingCode}</td>
+                            <td><div style="font-weight:500">${b.customerName||'—'}</div><div style="font-size:0.76rem;color:var(--muted)">${b.customerEmail||''}</div></td>
+                            <td>${b.bikeModel}</td>
+                            <td style="font-size:0.85rem">${b.serviceType}</td>
+                            <td style="font-size:0.85rem">${new Date(b.serviceDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</td>
+                            <td style="font-weight:600">₹${(b.totalAmount||0).toLocaleString('en-IN')}</td>
+                            <td>${statusBadge(b.status)}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    } catch (err) { document.getElementById('recent-bookings').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation"></i><h3>Error loading data</h3></div>'; }
+}
+</script>
+</body>
+</html>
