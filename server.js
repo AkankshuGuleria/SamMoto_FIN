@@ -45,8 +45,10 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 
 app.use(cors({
     origin: (origin, cb) => {
-        // allow same-origin requests (no origin header) and allowed list
-        if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+        // allow same-origin requests (no origin header), allowed list, and Vercel preview URLs
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            return cb(null, true);
+        }
         cb(new Error('Not allowed by CORS'));
     },
     credentials: true
@@ -111,7 +113,11 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/pages/index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`\n🏍️  SamMoto server running at http://localhost:${PORT}`);
-    console.log(`📁  Visit http://localhost:${PORT} to view the app.\n`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`\n🏍️  SamMoto server running at http://localhost:${PORT}`);
+        console.log(`📁  Visit http://localhost:${PORT} to view the app.\n`);
+    });
+}
+
+module.exports = app;
