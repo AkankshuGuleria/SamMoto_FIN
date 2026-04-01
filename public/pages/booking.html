@@ -37,7 +37,7 @@
                     <div class="form-row">
                         <div class="input-group">
                             <label>Bike Model</label>
-                            <select id="bikeModel">
+                            <select id="bikeModel" onchange="toggleOtherBike()">
                                 <option value="" disabled selected>Select your bike</option>
                                 <optgroup label="Royal Enfield">
                                     <option>RE Classic 350</option>
@@ -85,7 +85,12 @@
                                     <option>Suzuki Gixxer SF</option>
                                     <option>Suzuki Access 125</option>
                                 </optgroup>
+                                <option value="Other">Other</option>
                             </select>
+                            <div class="input-group" id="otherBikeGroup" style="display:none; margin-top:0.75rem;">
+                                <label>Your Bike Name & Model</label>
+                                <input type="text" id="otherBikeInput" placeholder="e.g. Hero Karizma XMR">
+                            </div>
                         </div>
                         <div class="input-group">
                             <label>Registration Number</label>
@@ -219,6 +224,11 @@
 
         function getCart() { return JSON.parse(localStorage.getItem('sm_cart') || '[]'); }
 
+        function toggleOtherBike() {
+            const val = document.getElementById('bikeModel').value;
+            document.getElementById('otherBikeGroup').style.display = val === 'Other' ? 'block' : 'none';
+        }
+
         function goStep(n) {
             [1, 2, 3].forEach(i => {
                 document.getElementById(`step${i}`).classList.toggle('hidden', i !== n);
@@ -227,7 +237,9 @@
         }
 
         function goStep2() {
-            if (!document.getElementById('bikeModel').value) { showToast('Please select your bike model.', 'error'); return; }
+            const bike = document.getElementById('bikeModel').value;
+            if (!bike) { showToast('Please select your bike model.', 'error'); return; }
+            if (bike === 'Other' && !document.getElementById('otherBikeInput').value.trim()) { showToast('Please write your bike name.', 'error'); return; }
             if (!document.getElementById('regNumber').value.trim()) { showToast('Please enter your registration number.', 'error'); return; }
             if (!document.getElementById('serviceType').value) { showToast('Please select a service type.', 'error'); return; }
             if (!document.getElementById('serviceDate').value) { showToast('Please choose a service date.', 'error'); return; }
@@ -269,7 +281,7 @@
 
             document.getElementById('booking-summary').innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
-            <span style="color:var(--muted)">Bike</span><span>${document.getElementById('bikeModel').value}</span>
+            <span style="color:var(--muted)">Bike</span><span>${document.getElementById('bikeModel').value === 'Other' ? document.getElementById('otherBikeInput').value : document.getElementById('bikeModel').value}</span>
             <span style="color:var(--muted)">Reg. No.</span><span>${document.getElementById('regNumber').value.toUpperCase()}</span>
             <span style="color:var(--muted)">Service</span><span>${document.getElementById('serviceType').value}</span>
             <span style="color:var(--muted)">Date</span><span>${(() => { const [y, m, d] = document.getElementById('serviceDate').value.split('-'); return new Date(+y, +m - 1, +d).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }); })()}</span>
@@ -284,7 +296,7 @@
             let partsCost = 0, laborCost = 0;
             cart.forEach(i => { const p = parseFloat(i.price) * (i.qty || 1); if (i.type === 'part') partsCost += p; else laborCost += p; });
             return {
-                bikeModel: document.getElementById('bikeModel').value,
+                bikeModel: document.getElementById('bikeModel').value === 'Other' ? document.getElementById('otherBikeInput').value : document.getElementById('bikeModel').value,
                 registrationNumber: document.getElementById('regNumber').value.toUpperCase(),
                 serviceType: document.getElementById('serviceType').value,
                 serviceDate: document.getElementById('serviceDate').value,
