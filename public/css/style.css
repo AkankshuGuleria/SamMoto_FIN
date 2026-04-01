@@ -381,7 +381,8 @@ footer {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
     .nav-links { display: none; }
-    .hamburger { display: flex; }
+    .nav-right .btn-nav, .nav-right span:not(.cart-badge) { display: none !important; }
+    .hamburger { display: flex; flex-shrink: 0; }
     .footer-grid { grid-template-columns: 1fr 1fr; }
     .cart-layout { grid-template-columns: 1fr; }
     .dash-sidebar { display: none; }

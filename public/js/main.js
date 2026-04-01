@@ -70,7 +70,15 @@ function renderNav() {
             <button onclick="Auth.logout()" class="btn-nav outline">Logout</button>`;
     }
 
-    if (mobileLinks) mobileLinks.innerHTML = navLinks.innerHTML;
+    if (mobileLinks) {
+        let mobHtml = navLinks.innerHTML;
+        if (!auth.loggedIn) {
+            mobHtml += `<li><a href="/login.html">Login</a></li><li><a href="/signup.html">Sign Up</a></li>`;
+        } else {
+            mobHtml += `<li><a href="#" onclick="Auth.logout()">Logout</a></li>`;
+        }
+        mobileLinks.innerHTML = mobHtml;
+    }
     updateCartBadge();
 }
 
