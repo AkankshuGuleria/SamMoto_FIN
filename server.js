@@ -35,7 +35,8 @@ connectDB();
 // ── Security Headers (Helmet) ──────────────────────────────────────────────
 app.use(helmet({
     contentSecurityPolicy: false,   // off — inline scripts used in HTML pages
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false  // allow Google Sign-In popups to return to main window
 }));
 
 // ── CORS — restrict to same origin in production ───────────────────────────
