@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -50,6 +51,19 @@
             <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">
                 <i class="fas fa-sign-in-alt"></i> Login
             </button>
+
+            <div style="text-align: center; margin: 15px 0; color: var(--muted); font-size: 0.9rem;">
+                Or login with
+            </div>
+
+            <!-- Google Sign-In Button -->
+            <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE" data-context="signin" data-ux_mode="popup"
+                data-callback="handleGoogleLogin" data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                data-text="signin_with" data-size="large" data-logo_alignment="left"
+                style="display: flex; justify-content: center; margin-bottom: 20px;">
+            </div>
 
             <div class="form-footer">
                 Don't have an account? <a href="/signup.html">Sign up free</a>
@@ -112,6 +126,29 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
+        }
+
+        async function handleGoogleLogin(response) {
+            const errEl = document.getElementById('error-msg');
+            errEl.classList.remove('show');
+            try {
+                const res = await fetch('/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    errEl.textContent = data.message || 'Google authentication failed.';
+                    errEl.classList.add('show');
+                    return;
+                }
+                Auth.setAuth(data);
+                window.location.replace(data.role === 'admin' ? '/admindashboard.html' : '/cust_dashboard.html');
+            } catch (err) {
+                errEl.textContent = 'Network error during Google login.';
+                errEl.classList.add('show');
             }
         }
     </script>

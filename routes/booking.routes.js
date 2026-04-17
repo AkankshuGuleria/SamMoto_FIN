@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
 const { verifyToken, requireAdmin } = require('../middleware/auth');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 const sanitize = (str, max = 200) => (typeof str === 'string' ? str.trim().substring(0, max) : '');
@@ -118,6 +127,30 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
 
         const booking = await Booking.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
         if (!booking) return safeErr(res, 404, 'Booking not found.');
+
+        // Send email if marked as Completed
+        if (status === 'Completed' && booking.customerEmail && process.env.EMAIL_USER) {
+            try {
+                await transporter.sendMail({
+                    from: `"SamMoto Bikes" <${process.env.EMAIL_USER}>`,
+                    to: booking.customerEmail,
+                    subject: 'Your Vehicle is Ready! - SamMoto',
+                    html: `
+                        <div style="font-family:Arial,sans-serif;color:#333;line-height:1.6;">
+                            <h2>Hi ${booking.customerName},</h2>
+                            <p>Great news! The service for your <strong>${booking.bikeModel}</strong> (${booking.registrationNumber}) is now complete.</p>
+                            <p>Your vehicle is ready for pickup.</p>
+                            <br/>
+                            <p>Thank you for choosing SamMoto!<br/>The SamMoto Team</p>
+                        </div>
+                    `
+                });
+            } catch (mailErr) {
+                console.error('[booking status] Email failed:', mailErr.message);
+                // Don't fail the request if email fails
+            }
+        }
+
         res.json({ success: true, booking });
     } catch (err) {
         console.error('[booking status]', err.message);

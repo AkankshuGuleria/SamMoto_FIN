@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 const { verifyToken } = require('../middleware/auth');
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 
 // ── Strict rate limit for auth endpoints — 10 per 15 min per IP ──────────
 const authLimiter = rateLimit({
@@ -88,6 +91,37 @@ router.post('/login', authLimiter, async (req, res) => {
 // POST /api/auth/logout — stateless; client discards token
 router.post('/logout', (req, res) => {
     res.json({ success: true, message: 'Logged out.' });
+});
+
+// POST /api/auth/google — authenticate via Google JWT
+router.post('/google', authLimiter, async (req, res) => {
+    try {
+        const { credential } = req.body;
+        if (!credential) return res.status(400).json({ success: false, message: 'Missing Google credential.' });
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const { sub, email, name } = payload;
+
+        let user = await User.findOne({ email });
+        if (user) {
+            if (!user.googleId) {
+                user.googleId = sub;
+                await user.save();
+            }
+        } else {
+            user = await User.create({ name: name || 'Google User', email: email.toLowerCase(), googleId: sub, role: 'customer' });
+        }
+
+        const token = signToken(user._id);
+        res.json({ success: true, token, role: user.role, name: user.name, email: user.email });
+    } catch (err) {
+        console.error('[google login]', err.message);
+        res.status(401).json({ success: false, message: 'Google authentication failed.' });
+    }
 });
 
 // GET /api/auth/me — return only safe fields
