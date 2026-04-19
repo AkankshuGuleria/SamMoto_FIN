@@ -1,169 +1,266 @@
 <!DOCTYPE html>
+<!-- Frontend redesign: upgraded the customer dashboard with the shared premium shell while preserving existing booking history IDs and dashboard logic. -->
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Garage — SamMoto</title>
+    <title>My Garage - SamMoto</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/service-cards.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
-<nav class="navbar">
-    <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
-    <ul class="nav-links" id="nav-links"></ul>
-    <div class="nav-right" id="nav-right"></div>
-</nav>
+    <div class="page-transition" id="page-transition"></div>
 
-<div class="dash-layout">
-    <aside class="dash-sidebar">
-        <div class="logo">SAM<span>MOTO</span></div>
-        <div class="sidebar-section">Menu</div>
-        <a href="/cust_dashboard.html" class="sidebar-link active"><i class="fas fa-gauge"></i> Dashboard</a>
-        <a href="/booking.html" class="sidebar-link"><i class="fas fa-calendar-plus"></i> Book Service</a>
-        <a href="/shop.html" class="sidebar-link"><i class="fas fa-store"></i> Shop Parts</a>
-        <a href="/cart.html" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Cart</a>
-        <div class="sidebar-section" style="margin-top:auto"></div>
-        <a href="#" class="sidebar-link" id="sos-btn" style="color:var(--accent)"><i class="fas fa-phone"></i> SOS Roadside</a>
-        <a href="#" class="sidebar-link" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        <div class="sidebar-user">
-            <div class="name" id="user-name">Loading...</div>
-            <div class="role">Customer</div>
-        </div>
-    </aside>
-
-    <main class="dash-main">
-        <div class="dash-header">
-            <h1>My Garage</h1>
-            <p>Track your bookings and service history</p>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="label">Total Bookings</div>
-                <div class="value" id="stat-total">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Completed</div>
-                <div class="value green" id="stat-completed">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Pending / In Progress</div>
-                <div class="value orange" id="stat-active">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Total Spent</div>
-                <div class="value accent" id="stat-spent">—</div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap">
-            <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> New Booking</a>
-            <a href="/shop.html" class="btn btn-secondary"><i class="fas fa-store"></i> Shop Parts</a>
-        </div>
-
-        <!-- Bookings Table -->
-        <div class="table-section">
-            <div class="table-section-header">
-                <h3>My Bookings</h3>
-                <div style="display:flex;gap:0.5rem">
-                    <select id="status-filter" onchange="filterBookings()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius);font-size:0.82rem;outline:none">
-                        <option value="all">All Status</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
+    <div id="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-gauge">
+                <svg viewBox="0 0 240 240" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="samMotoRevGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#7a0f18"></stop>
+                            <stop offset="55%" stop-color="#e63946"></stop>
+                            <stop offset="100%" stop-color="#ff7b85"></stop>
+                        </linearGradient>
+                    </defs>
+                    <circle class="preloader-track" cx="120" cy="120" r="82"></circle>
+                    <circle class="preloader-arc" cx="120" cy="120" r="82"></circle>
+                </svg>
+                <div class="preloader-rpm">
+                    <strong>9.5K</strong>
+                    <span>Rev Limit</span>
                 </div>
             </div>
-            <div id="bookings-list"><div class="loading-center"><div class="spinner"></div></div></div>
+            <div class="preloader-word" aria-label="SAMMOTO">
+                <span>S</span>
+                <span>A</span>
+                <span>M</span>
+                <span class="accent">M</span>
+                <span class="accent">O</span>
+                <span class="accent">T</span>
+                <span class="accent">O</span>
+            </div>
         </div>
-    </main>
-</div>
+    </div>
 
-<script src="/js/auth.js"></script>
-<script src="/js/main.js"></script>
-<script>
-if (!Auth.requireRole('customer')) {}
+    <nav class="navbar">
+        <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
+        <ul class="nav-links" id="nav-links"></ul>
+        <div class="nav-right" id="nav-right"></div>
+    </nav>
 
-let allBookings = [];
+    <div class="dash-layout">
+        <aside class="dash-sidebar">
+            <div class="logo">SAM<span>MOTO</span></div>
+            <div class="sidebar-section">Menu</div>
+            <a href="/cust_dashboard.html" class="sidebar-link active"><i class="fas fa-gauge"></i> Dashboard</a>
+            <a href="/booking.html" class="sidebar-link"><i class="fas fa-calendar-plus"></i> Book Service</a>
+            <a href="/shop.html" class="sidebar-link"><i class="fas fa-store"></i> Shop Parts</a>
+            <a href="/cart.html" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Cart</a>
+            <div class="sidebar-section" style="margin-top:auto;"></div>
+            <a href="#" class="sidebar-link" id="sos-btn" style="color:var(--accent);"><i class="fas fa-phone"></i> SOS
+                Roadside</a>
+            <a href="#" class="sidebar-link" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <div class="sidebar-user">
+                <div class="name" id="user-name">Loading...</div>
+                <div class="role">Customer</div>
+            </div>
+        </aside>
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const auth = Auth.getAuth();
-    document.getElementById('user-name').textContent = auth.name || 'Customer';
+        <main class="dash-main">
+            <div class="dash-header">
+                <h1>My Garage</h1>
+                <p>Track current jobs, completed services, and how much workshop time your bike has consumed.</p>
+            </div>
 
-    document.getElementById('sos-btn').addEventListener('click', e => {
-        e.preventDefault();
-        if (confirm('Call SamMoto Roadside Assistance?\n+91 98765 43210')) window.location.href = 'tel:+919876543210';
-    });
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">Total Bookings</div>
+                    <div class="value" id="stat-total">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Completed</div>
+                    <div class="value green" id="stat-completed">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Pending / In Progress</div>
+                    <div class="value orange" id="stat-active">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Total Spent</div>
+                    <div class="value accent" id="stat-spent">-</div>
+                </div>
+            </div>
+            <!-- Service Overview Section -->
+            <section class="service-overview" id="service-overview">
+                <div class="overview-summary">
+                    <div class="queue-status card">
+                        <h3>Queue</h3>
+                        <p>0 open bookings</p>
+                        <p>0 waiting intake, 0 approved, 0 on the floor.</p>
+                    </div>
+                    <div class="team-status card">
+                        <h3>Team status</h3>
+                        <p>0 mechanics available</p>
+                        <p>0 busy and 0 off duty right now.</p>
+                    </div>
+                </div>
+                <div class="service-cards">
+                    <div class="service-card" data-service="General Service" data-price="599">
+                        <h4>General Service</h4>
+                        <p>Full health check, oil change, tune-up, consumables, and riding‑performance inspection.</p>
+                        <span class="price">Starting ₹599</span>
+                    </div>
+                    <div class="service-card" data-service="Engine Overhaul" data-price="3999">
+                        <h4>Engine Overhaul</h4>
+                        <p>Compression testing, tear‑downs, rebuilds, and precision replacement for serious mechanical
+                            recovery.</p>
+                        <span class="price">Starting ₹3999</span>
+                    </div>
+                    <div class="service-card" data-service="Tyres and Brakes" data-price="299">
+                        <h4>Tyres and Brakes</h4>
+                        <p>Grip, stopping power, balancing, pad swaps, and brake servicing tuned for safer aggressive
+                            riding.</p>
+                        <span class="price">Starting ₹299</span>
+                    </div>
+                    <div class="service-card" data-service="Electrical and Wiring" data-price="199">
+                        <h4>Electrical and Wiring</h4>
+                        <p>Battery diagnostics, charging systems, lighting, wiring recovery, and electrical fault
+                            tracing.</p>
+                        <span class="price">Starting ₹199</span>
+                    </div>
+                    <div class="service-card" data-service="Suspension Setup" data-price="799">
+                        <h4>Suspension Setup</h4>
+                        <p>Fork servicing, shock tuning, and chassis corrections for sharper confidence in every corner.
+                        </p>
+                        <span class="price">Starting ₹799</span>
+                    </div>
+                    <div class="service-card" data-service="Bodywork and Paint" data-price="1499">
+                        <h4>Bodywork and Paint</h4>
+                        <p>Dent repair, restoration, detailing, and custom finishes that make your bike feel showroom
+                            fresh.</p>
+                        <span class="price">Starting ₹1499</span>
+                    </div>
+                </div>
+            </section>
+            <div class="stats-grid">
 
-    await loadBookings();
-});
 
-async function loadBookings() {
-    try {
-        const res = await fetch('/api/bookings/history', { headers: Auth.getAuthHeader() });
-        if (res.status === 401) { Auth.logout(); return; }
-        allBookings = await res.json();
+                <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;">
+                    <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> New Booking</a>
+                    <a href="/shop.html" class="btn btn-secondary"><i class="fas fa-store"></i> Shop Parts</a>
+                </div>
 
-        // Stats
-        const completed = allBookings.filter(b => b.status === 'Completed').length;
-        const active = allBookings.filter(b => ['Pending','Confirmed','In Progress'].includes(b.status)).length;
-        const spent = allBookings.filter(b => b.paymentStatus === 'Paid').reduce((s, b) => s + (b.totalAmount || 0), 0);
+                <div class="table-section">
+                    <div class="table-section-header">
+                        <h3>My Bookings</h3>
+                        <div style="display:flex;gap:0.5rem;">
+                            <select id="status-filter" onchange="filterBookings()"
+                                style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text);padding:10px 12px;border-radius:14px;font-size:0.82rem;outline:none;">
+                                <option value="all">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="bookings-list">
+                        <div class="loading-center">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+        </main>
+    </div>
 
-        document.getElementById('stat-total').textContent = allBookings.length;
-        document.getElementById('stat-completed').textContent = completed;
-        document.getElementById('stat-active').textContent = active;
-        document.getElementById('stat-spent').textContent = '₹' + spent.toLocaleString('en-IN');
+    <script src="/js/auth.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="/js/service-cards.js" defer></script>
+    <script src="/js/animations.js" defer></script>
+    <script>
+        if (!Auth.requireRole('customer')) { }
 
-        renderBookings(allBookings);
-    } catch (err) {
-        document.getElementById('bookings-list').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation"></i><h3>Failed to load bookings</h3></div>';
-    }
-}
+        let allBookings = [];
 
-function filterBookings() {
-    const filter = document.getElementById('status-filter').value;
-    const filtered = filter === 'all' ? allBookings : allBookings.filter(b => b.status === filter);
-    renderBookings(filtered);
-}
+        document.addEventListener('DOMContentLoaded', async () => {
+            const auth = Auth.getAuth();
+            document.getElementById('user-name').textContent = auth.name || 'Customer';
 
-function renderBookings(list) {
-    const el = document.getElementById('bookings-list');
-    if (!list.length) {
-        el.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-xmark"></i><h3>No bookings found</h3><p>Book your first service to get started.</p><a href="/booking.html" class="btn btn-primary mt-3">Book Now</a></div>`;
-        return;
-    }
+            document.getElementById('sos-btn').addEventListener('click', e => {
+                e.preventDefault();
+                if (confirm('Call SamMoto Roadside Assistance?\n+91 98765 43210')) window.location.href = 'tel:+919876543210';
+            });
 
-    const statusBadge = s => {
-        const map = { Pending:'pending', Confirmed:'confirmed', 'In Progress':'progress', Completed:'completed', Cancelled:'cancelled' };
-        return `<span class="badge badge-${map[s]||'pending'}">${s}</span>`;
-    };
-    const payBadge = s => `<span class="badge badge-${s==='Paid'?'paid':'unpaid'}">${s}</span>`;
+            await loadBookings();
+        });
 
-    el.innerHTML = `
-        <div class="table-wrap">
-            <table class="table">
-                <thead><tr>
-                    <th>Booking Code</th><th>Bike</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th><th>Payment</th>
-                </tr></thead>
-                <tbody>${list.map(b => `
-                    <tr>
-                        <td style="font-family:monospace;font-size:0.85rem;color:var(--accent)">${b.bookingCode}</td>
-                        <td><div style="font-weight:500">${b.bikeModel}</div><div style="font-size:0.78rem;color:var(--muted)">${b.registrationNumber}</div></td>
-                        <td>${b.serviceType}</td>
-                        <td style="font-size:0.85rem">${new Date(b.serviceDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
-                        <td style="font-weight:600">₹${(b.totalAmount||0).toLocaleString('en-IN')}</td>
-                        <td>${statusBadge(b.status)}</td>
-                        <td>${payBadge(b.paymentStatus)}</td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-        </div>`;
-}
-</script>
+        async function loadBookings() {
+            try {
+                const res = await fetch('/api/bookings/history', { headers: Auth.getAuthHeader() });
+                if (res.status === 401) { Auth.logout(); return; }
+                allBookings = await res.json();
+
+                const completed = allBookings.filter(b => b.status === 'Completed').length;
+                const active = allBookings.filter(b => ['Pending', 'Confirmed', 'In Progress'].includes(b.status)).length;
+                const spent = allBookings.filter(b => b.paymentStatus === 'Paid').reduce((s, b) => s + (b.totalAmount || 0), 0);
+
+                document.getElementById('stat-total').textContent = allBookings.length;
+                document.getElementById('stat-completed').textContent = completed;
+                document.getElementById('stat-active').textContent = active;
+                document.getElementById('stat-spent').textContent = '₹' + spent.toLocaleString('en-IN');
+
+                renderBookings(allBookings);
+            } catch (err) {
+                document.getElementById('bookings-list').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation"></i><h3>Failed to load bookings</h3></div>';
+            }
+        }
+
+        function filterBookings() {
+            const filter = document.getElementById('status-filter').value;
+            const filtered = filter === 'all' ? allBookings : allBookings.filter(b => b.status === filter);
+            renderBookings(filtered);
+        }
+
+        function renderBookings(list) {
+            const el = document.getElementById('bookings-list');
+            if (!list.length) {
+                el.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-xmark"></i><h3>No bookings found</h3><p>Book your first service to get started.</p><a href="/booking.html" class="btn btn-primary mt-3">Book Now</a></div>';
+                return;
+            }
+
+            const statusBadge = s => {
+                const map = { Pending: 'pending', Confirmed: 'confirmed', 'In Progress': 'progress', Completed: 'completed', Cancelled: 'cancelled' };
+                return `<span class="badge badge-${map[s] || 'pending'}">${s}</span>`;
+            };
+            const payBadge = s => `<span class="badge badge-${s === 'Paid' ? 'paid' : 'unpaid'}">${s}</span>`;
+
+            el.innerHTML = `
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead><tr>
+                            <th>Booking Code</th><th>Bike</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th><th>Payment</th>
+                        </tr></thead>
+                        <tbody>${list.map(b => `
+                            <tr>
+                                <td style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent);letter-spacing:0.08em;">${b.bookingCode}</td>
+                                <td><div style="font-weight:600;">${b.bikeModel}</div><div style="font-size:0.78rem;color:var(--muted-2);">${b.registrationNumber}</div></td>
+                                <td>${b.serviceType}</td>
+                                <td style="font-size:0.85rem;">${new Date(b.serviceDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                <td style="font-weight:600;">₹${(b.totalAmount || 0).toLocaleString('en-IN')}</td>
+                                <td>${statusBadge(b.status)}</td>
+                                <td>${payBadge(b.paymentStatus)}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+    </script>
 </body>
+
 </html>

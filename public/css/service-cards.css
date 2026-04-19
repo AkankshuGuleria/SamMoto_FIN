@@ -1,0 +1,194 @@
+/* service-cards.css – premium glassmorphism + scroll-ready */
+
+/* ── Section wrapper ── */
+.service-overview {
+    padding: 2.5rem 1.5rem;
+    margin: 2rem 0;
+    color: var(--text-primary, #f0f0f0);
+}
+
+.service-overview-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent, #e63946);
+    margin-bottom: 1.2rem;
+}
+
+/* ── Queue & Team status ── */
+.overview-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.overview-summary .card {
+    flex: 1 1 240px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    padding: 1.1rem 1.4rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* starts off-screen above for GSAP drop animation */
+}
+
+.overview-summary .card h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent, #e63946);
+}
+
+.overview-summary .card p {
+    margin: 0.2rem 0;
+    font-size: 0.88rem;
+    color: rgba(240, 240, 240, 0.72);
+    line-height: 1.5;
+}
+
+/* ── Service cards grid ── */
+.service-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem;
+}
+
+.service-card {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    padding: 1.3rem 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(230, 57, 70, 0.08), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.28s ease;
+    pointer-events: none;
+    border-radius: 1rem;
+}
+
+.service-card:hover {
+    transform: translateY(-5px) scale(1.015);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    border-color: rgba(230, 57, 70, 0.35);
+}
+
+.service-card:hover::before {
+    opacity: 1;
+}
+
+/* selected state */
+.service-card.sc-selected {
+    border-color: var(--accent, #e63946);
+    box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.4), 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+
+.service-card h4 {
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent, #e63946);
+}
+
+.service-card p {
+    margin: 0 0 0.9rem;
+    font-size: 0.87rem;
+    line-height: 1.55;
+    color: rgba(240, 240, 240, 0.7);
+}
+
+.service-card .price {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary, #f0f0f0);
+    background: rgba(230, 57, 70, 0.12);
+    padding: 0.2rem 0.65rem;
+    border-radius: 0.4rem;
+    border: 1px solid rgba(230, 57, 70, 0.2);
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+    .overview-summary {
+        flex-direction: column;
+    }
+
+    .service-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Queue & Team status section (below hero) ── */
+.queue-team-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    padding: 0 1.5rem 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+    /* clip cards while they fly down */
+}
+
+.qt-card {
+    flex: 1 1 260px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    padding: 1.3rem 1.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    /* GSAP will animate from y:-100, opacity:0 */
+}
+
+.qt-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent, #e63946);
+    margin-bottom: 0.55rem;
+}
+
+.qt-card strong {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary, #f0f0f0);
+    margin-bottom: 0.3rem;
+}
+
+.qt-card p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(240, 240, 240, 0.65);
+    line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+    .queue-team-section {
+        flex-direction: column;
+    }
+}

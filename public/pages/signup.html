@@ -1,18 +1,50 @@
 <!DOCTYPE html>
+<!-- Frontend redesign: refreshed the signup page with the shared premium UI shell while preserving all auth IDs, callbacks, and inline logic. -->
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up — SamMoto</title>
+    <title>Sign Up - SamMoto</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
+    <div class="page-transition" id="page-transition"></div>
+
+    <div id="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-gauge">
+                <svg viewBox="0 0 240 240" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="samMotoRevGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#7a0f18"></stop>
+                            <stop offset="55%" stop-color="#e63946"></stop>
+                            <stop offset="100%" stop-color="#ff7b85"></stop>
+                        </linearGradient>
+                    </defs>
+                    <circle class="preloader-track" cx="120" cy="120" r="82"></circle>
+                    <circle class="preloader-arc" cx="120" cy="120" r="82"></circle>
+                </svg>
+                <div class="preloader-rpm">
+                    <strong>9.5K</strong>
+                    <span>Rev Limit</span>
+                </div>
+            </div>
+            <div class="preloader-word" aria-label="SAMMOTO">
+                <span>S</span>
+                <span>A</span>
+                <span>M</span>
+                <span class="accent">M</span>
+                <span class="accent">O</span>
+                <span class="accent">T</span>
+                <span class="accent">O</span>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar">
         <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
         <div></div>
@@ -22,9 +54,9 @@
     </nav>
 
     <div class="form-page">
-        <div class="form-box" style="max-width:500px">
+        <div class="form-box" style="max-width:560px;">
             <h2>Create Account</h2>
-            <p class="sub">Join SamMoto — track your service history, shop genuine parts</p>
+            <p class="sub">Join SamMoto to manage service history, shop parts, and move through every booking with confidence.</p>
 
             <div class="alert alert-danger" id="error-msg"></div>
             <div class="alert alert-success" id="success-msg"></div>
@@ -46,9 +78,8 @@
             <div class="input-group">
                 <label>Password</label>
                 <div class="input-wrap">
-                    <input type="password" id="password" placeholder="Min. 6 characters">
-                    <button class="eye-btn" id="toggle-eye" tabindex="-1"><i class="fas fa-eye"
-                            id="eye-icon"></i></button>
+                    <input type="password" id="password" placeholder="Minimum 6 characters">
+                    <button class="eye-btn" id="toggle-eye" tabindex="-1"><i class="fas fa-eye" id="eye-icon"></i></button>
                 </div>
             </div>
             <div class="input-group">
@@ -56,12 +87,10 @@
                 <input type="password" id="confirm" placeholder="Re-enter password">
             </div>
 
-            <div style="margin-bottom:1.5rem">
-                <label
-                    style="display:flex;align-items:flex-start;gap:10px;font-size:0.84rem;color:var(--muted);cursor:pointer">
-                    <input type="checkbox" id="terms" style="accent-color:var(--accent);margin-top:3px">
-                    I agree to the <a href="#" class="text-accent" style="margin:0 4px">Terms of Service</a> and <a
-                        href="#" class="text-accent">Privacy Policy</a>
+            <div style="margin-bottom:1.5rem;">
+                <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.84rem;color:rgba(240,240,240,0.68);cursor:pointer;">
+                    <input type="checkbox" id="terms" style="accent-color:var(--accent);margin-top:3px;">
+                    I agree to the <a href="#" class="text-accent" style="margin:0 4px;">Terms of Service</a> and <a href="#" class="text-accent">Privacy Policy</a>
                 </label>
             </div>
 
@@ -69,11 +98,10 @@
                 <i class="fas fa-user-plus"></i> Create Account
             </button>
 
-            <div style="text-align: center; margin: 15px 0; color: var(--muted); font-size: 0.9rem;">
-                Or sign in with
+            <div style="text-align:center;margin:18px 0;color:rgba(240,240,240,0.56);font-size:0.82rem;letter-spacing:0.18em;text-transform:uppercase;">
+                Or continue with
             </div>
 
-            <!-- Google Sign-In Button -->
             <div id="g_id_onload"
                 data-client_id="900727918656-1iui953ls2519qedlpkpvb6iu16lqiph.apps.googleusercontent.com"
                 data-context="signup" data-ux_mode="popup" data-callback="handleGoogleLogin" data-auto_prompt="false"
@@ -81,7 +109,7 @@
             </div>
             <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
                 data-text="signup_with" data-size="large" data-logo_alignment="left"
-                style="display: flex; justify-content: center; margin-bottom: 20px;">
+                style="display:flex;justify-content:center;margin-bottom:20px;">
             </div>
 
             <div class="form-footer">
@@ -91,6 +119,9 @@
     </div>
 
     <script src="/js/auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="/js/animations.js" defer></script>
     <script>
         const _a = Auth.getAuth();
         if (_a.loggedIn) window.location.replace(_a.role === 'admin' ? '/admindashboard.html' : '/cust_dashboard.html');

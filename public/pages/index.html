@@ -1,29 +1,50 @@
 <!DOCTYPE html>
+<!-- Frontend redesign: reshaped the homepage hero into a layered diagnostic board with smoother DOM motion while preserving existing product-loading logic. -->
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SamMoto — Expert Motorcycle Service & Shop</title>
+    <title>SamMoto - Expert Motorcycle Service and Shop</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/service-cards.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
 </head>
 
 <body>
+    <div class="page-transition" id="page-transition"></div>
 
-    <!-- Preloader -->
     <div id="preloader">
-        <div style="text-align:center">
-            <div class="preloader-logo">SAM<span>MOTO</span></div>
-            <div class="preloader-bar">
-                <div class="preloader-fill"></div>
+        <div class="preloader-inner">
+            <div class="preloader-gauge">
+                <svg viewBox="0 0 240 240" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="samMotoRevGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#7a0f18"></stop>
+                            <stop offset="55%" stop-color="#e63946"></stop>
+                            <stop offset="100%" stop-color="#ff7b85"></stop>
+                        </linearGradient>
+                    </defs>
+                    <circle class="preloader-track" cx="120" cy="120" r="82"></circle>
+                    <circle class="preloader-arc" cx="120" cy="120" r="82"></circle>
+                </svg>
+                <div class="preloader-rpm">
+                    <strong>9.5K</strong>
+                    <span>Rev Limit</span>
+                </div>
+            </div>
+            <div class="preloader-word" aria-label="SAMMOTO">
+                <span>S</span>
+                <span>A</span>
+                <span>M</span>
+                <span class="accent">M</span>
+                <span class="accent">O</span>
+                <span class="accent">T</span>
+                <span class="accent">O</span>
             </div>
         </div>
     </div>
 
-    <!-- Navbar -->
     <nav class="navbar">
         <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
         <ul class="nav-links" id="nav-links"></ul>
@@ -34,150 +55,270 @@
         <div id="mobile-links"></div>
     </div>
 
-    <!-- Hero -->
     <section class="hero">
-        <div class="hero-content">
-            <span class="hero-eyebrow"><i class="fas fa-motorcycle"></i> &nbsp; Dharamshala's Premier Bike
-                Workshop</span>
-            <h1>Your Ride<br>Deserves<br><span>Expert Care</span></h1>
-            <p>From genuine spare parts to full engine overhauls — SamMoto is your trusted partner for every motorcycle
-                need.</p>
-            <div class="hero-actions">
-                <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Book Service</a>
-                <a href="/shop.html" class="btn btn-secondary"><i class="fas fa-store"></i> Browse Shop</a>
+        <div class="hero-grid">
+            <div class="hero-content">
+                <span class="hero-eyebrow"><i class="fas fa-wave-square"></i> Dharamshala rider operations desk</span>
+                <div class="hero-microcopy">
+                    <span>Live diagnostics lane</span>
+                    <span>Parts-ready workflow</span>
+                    <span>Smooth rider updates</span>
+                </div>
+                <h1>Service clarity for <span>every serious ride</span></h1>
+                <p>SamMoto now opens like a workshop control board instead of another speed-heavy template, pairing
+                    genuine spares and mechanical depth with a calmer, more deliberate rider experience.</p>
+                <div class="hero-actions">
+                    <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Book
+                        Service</a>
+                    <a href="/shop.html" class="btn btn-secondary"><i class="fas fa-store"></i> Browse Shop</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="num" id="hero-stat-total">--</span>
+                        <span class="label">Total bookings</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="num" id="hero-stat-mechanics">--</span>
+                        <span class="label">Mechanics on roster</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="num" id="hero-stat-completed">--</span>
+                        <span class="label">Completed jobs</span>
+                    </div>
+                </div>
             </div>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <div class="num">2500+</div>
-                    <div class="label">Bikes Serviced</div>
+
+            <div class="hero-board" id="hero-board">
+                <div class="hero-orbit hero-orbit-a" aria-hidden="true"></div>
+                <div class="hero-orbit hero-orbit-b" aria-hidden="true"></div>
+
+                <div class="hero-board-shell">
+                    <div class="hero-board-topline">
+                        <span class="hero-status-pill"><i class="fas fa-circle"></i> Live workflow</span>
+                        <span class="hero-board-meta" id="hero-board-meta">Syncing workshop data</span>
+                    </div>
+
+                    <div class="hero-board-grid">
+                        <article class="hero-panel hero-panel-primary">
+                            <div class="hero-panel-head">
+                                <div>
+                                    <span id="hero-telemetry-label">Open workflow</span>
+                                    <strong id="hero-telemetry-value">--</strong>
+                                </div>
+                                <span class="hero-panel-badge" id="hero-panel-badge">Loading</span>
+                            </div>
+                            <p id="hero-summary">Pulling live booking and mechanic data from the database.</p>
+                            <div class="hero-signal" aria-hidden="true">
+                                <span class="hero-signal-bar" style="--signal-index:0;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:1;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:2;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:3;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:4;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:5;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:6;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:7;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:8;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:9;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:10;" data-signal-bar></span>
+                                <span class="hero-signal-bar" style="--signal-index:11;" data-signal-bar></span>
+                            </div>
+                            <div class="hero-signal-scale">
+                                <span id="hero-signal-start">12-day flow</span>
+                                <span>Bookings created</span>
+                                <span id="hero-signal-end">Today</span>
+                            </div>
+                        </article>
+
+                        <article class="hero-panel hero-panel-list">
+                            <div class="hero-panel-title">Current workshop lane</div>
+                            <div class="hero-panel-caption" id="hero-lane-caption">Tap a stage below to filter live
+                                bookings.</div>
+                            <div class="hero-lane-list" id="hero-lane-list">
+                                <div class="hero-lane-empty">Loading lane data...</div>
+                            </div>
+                        </article>
+
+                        <article class="hero-panel hero-panel-meta">
+                            <div class="hero-metric-stack">
+                                <div>
+                                    <span>Mechanics available</span>
+                                    <strong id="hero-available-mechanics">--</strong>
+                                </div>
+                                <div>
+                                    <span>In progress now</span>
+                                    <strong id="hero-in-progress">--</strong>
+                                </div>
+                            </div>
+                        </article>
+
+                        <div class="hero-timeline" aria-label="Service flow">
+                            <div class="hero-timeline-track"></div>
+                            <div class="hero-timeline-fill"></div>
+                            <div class="hero-timeline-stops">
+                                <button class="hero-timeline-stop is-active" type="button" data-status-filter="Pending">
+                                    <span class="hero-timeline-stop-label">Intake</span>
+                                    <strong class="hero-timeline-stop-count" id="hero-count-pending">0</strong>
+                                </button>
+                                <button class="hero-timeline-stop" type="button" data-status-filter="Confirmed">
+                                    <span class="hero-timeline-stop-label">Estimate</span>
+                                    <strong class="hero-timeline-stop-count" id="hero-count-confirmed">0</strong>
+                                </button>
+                                <button class="hero-timeline-stop" type="button" data-status-filter="In Progress">
+                                    <span class="hero-timeline-stop-label">Repair</span>
+                                    <strong class="hero-timeline-stop-count" id="hero-count-progress">0</strong>
+                                </button>
+                                <button class="hero-timeline-stop" type="button" data-status-filter="Completed">
+                                    <span class="hero-timeline-stop-label">Pickup</span>
+                                    <strong class="hero-timeline-stop-count" id="hero-count-completed">0</strong>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="hero-stat">
-                    <div class="num">12+</div>
-                    <div class="label">Expert Mechanics</div>
-                </div>
-                <div class="hero-stat">
-                    <div class="num">8 Yrs</div>
-                    <div class="label">Experience</div>
-                </div>
+
+
             </div>
         </div>
-        <div class="hero-visual">⚙</div>
     </section>
 
-    <!-- Services -->
-    <section style="background:var(--bg2)">
+    <!-- Queue & Team status cards — drop in on scroll -->
+    <section class="queue-team-section" id="queue-team-section">
+        <div class="qt-card" id="qt-queue">
+            <span class="qt-label"><i class="fas fa-layer-group"></i> Queue view</span>
+            <strong id="hero-floating-open">0 open bookings</strong>
+            <p id="hero-floating-open-copy">0 waiting intake, 0 approved, 0 on the floor.</p>
+        </div>
+        <div class="qt-card" id="qt-team">
+            <span class="qt-label"><i class="fas fa-users"></i> Team status</span>
+            <strong id="hero-floating-team">0 mechanics available</strong>
+            <p id="hero-floating-team-copy">0 busy and 0 off duty right now.</p>
+        </div>
+    </section>
+
+    <section style="background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);">
         <div class="section-header">
-            <span class="eyebrow">What We Do</span>
-            <h2>Complete Motorcycle <span>Services</span></h2>
-            <p>Everything your bike needs, under one roof</p>
+            <span class="eyebrow">Workshop systems</span>
+            <h2>Complete motorcycle <span>care stack</span></h2>
+            <p>Every service lane is designed like a high-performance pit stop: deliberate, transparent, and obsessively
+                detailed.</p>
         </div>
         <div class="grid-3">
             <div class="card">
                 <div class="card-icon"><i class="fas fa-tools"></i></div>
                 <h3>General Service</h3>
-                <p>Full bike checkup, oil change, filter replacement, and tune-up for peak performance.</p>
-                <div style="margin-top:1rem;font-size:0.85rem;color:var(--accent);font-weight:600">Starting ₹599</div>
+                <p>Full health check, oil change, tune-up, consumables, and riding-performance inspection.</p>
+                <div
+                    style="margin-top:1rem;font-size:0.84rem;color:var(--accent);font-weight:700;letter-spacing:0.12em;text-transform:uppercase">
+                    Starting 599</div>
             </div>
             <div class="card">
                 <div class="card-icon"><i class="fas fa-cog"></i></div>
                 <h3>Engine Overhaul</h3>
-                <p>Deep engine diagnostics, bore repair, piston replacement, and full engine rebuild.</p>
-                <div style="margin-top:1rem;font-size:0.85rem;color:var(--accent);font-weight:600">Starting ₹3,999</div>
+                <p>Compression testing, tear-downs, rebuilds, and precision replacement for serious mechanical recovery.
+                </p>
+                <div
+                    style="margin-top:1rem;font-size:0.84rem;color:var(--accent);font-weight:700;letter-spacing:0.12em;text-transform:uppercase">
+                    Starting 3999</div>
             </div>
             <div class="card">
                 <div class="card-icon"><i class="fas fa-circle-dot"></i></div>
-                <h3>Tyres & Brakes</h3>
-                <p>Tyre change, balancing, brake pad replacement, and disc/drum servicing.</p>
-                <div style="margin-top:1rem;font-size:0.85rem;color:var(--accent);font-weight:600">Starting ₹299</div>
+                <h3>Tyres and Brakes</h3>
+                <p>Grip, stopping power, balancing, pad swaps, and brake servicing tuned for safer aggressive riding.
+                </p>
+                <div
+                    style="margin-top:1rem;font-size:0.84rem;color:var(--accent);font-weight:700;letter-spacing:0.12em;text-transform:uppercase">
+                    Starting 299</div>
             </div>
             <div class="card">
                 <div class="card-icon"><i class="fas fa-bolt"></i></div>
-                <h3>Electrical & Wiring</h3>
-                <p>Battery checks, wiring repairs, horn, lights, starter motor — full electrical service.</p>
-                <div style="margin-top:1rem;font-size:0.85rem;color:var(--accent);font-weight:600">Starting ₹199</div>
+                <h3>Electrical and Wiring</h3>
+                <p>Battery diagnostics, charging systems, lighting, wiring recovery, and electrical fault tracing.</p>
+                <div
+                    style="margin-top:1rem;font-size:0.84rem;color:var(--accent);font-weight:700;letter-spacing:0.12em;text-transform:uppercase">
+                    Starting 199</div>
             </div>
             <div class="card">
                 <div class="card-icon"><i class="fas fa-gauge"></i></div>
                 <h3>Suspension Setup</h3>
-                <p>Fork oil change, shock absorber service, and alignment for a smoother ride.</p>
-                <div style="margin-top:1rem;font-size:0.85rem;color:var(--accent);font-weight:600">Starting ₹799</div>
+                <p>Fork servicing, shock tuning, and chassis corrections for sharper confidence in every corner.</p>
+                <div
+                    style="margin-top:1rem;font-size:0.84rem;color:var(--accent);font-weight:700;letter-spacing:0.12em;text-transform:uppercase">
+                    Starting 799</div>
             </div>
             <div class="card">
                 <div class="card-icon"><i class="fas fa-spray-can"></i></div>
-                <h3>Bodywork & Paint</h3>
-                <p>Dent removal, panel repair, custom paint jobs, and full body restoration.</p>
-                <div style="margin-top:1rem;font-size:0.85rem;color:var(--accent);font-weight:600">Starting ₹1,499</div>
+                <h3>Bodywork and Paint</h3>
+                <p>Dent repair, restoration, detailing, and custom finishes that make your bike feel showroom fresh.</p>
+                <div
+                    style="margin-top:1rem;font-size:0.84rem;color:var(--accent);font-weight:700;letter-spacing:0.12em;text-transform:uppercase">
+                    Starting 1499</div>
             </div>
         </div>
     </section>
 
-    <!-- Why Us -->
     <section>
         <div class="section-header">
             <span class="eyebrow">Why SamMoto</span>
-            <h2>Built for <span>Riders</span></h2>
+            <h2>Built for riders who notice <span>everything</span></h2>
         </div>
         <div class="grid-4">
-            <div style="text-align:center;padding:1.5rem">
-                <div style="font-size:2rem;color:var(--accent);margin-bottom:1rem"><i class="fas fa-shield-halved"></i>
-                </div>
-                <h4 style="margin-bottom:0.5rem">Genuine Parts</h4>
-                <p style="color:var(--muted);font-size:0.85rem">Only OEM and certified aftermarket parts</p>
+            <div class="card" style="text-align:center;">
+                <div class="card-icon" style="margin-inline:auto;"><i class="fas fa-shield-halved"></i></div>
+                <h3>Genuine Parts</h3>
+                <p>OEM and trusted aftermarket stock only. No cheap compromises.</p>
             </div>
-            <div style="text-align:center;padding:1.5rem">
-                <div style="font-size:2rem;color:var(--accent);margin-bottom:1rem"><i class="fas fa-clock"></i></div>
-                <h4 style="margin-bottom:0.5rem">Quick Turnaround</h4>
-                <p style="color:var(--muted);font-size:0.85rem">Most services done same day</p>
+            <div class="card" style="text-align:center;">
+                <div class="card-icon" style="margin-inline:auto;"><i class="fas fa-clock"></i></div>
+                <h3>Fast Turnaround</h3>
+                <p>High-velocity workshop ops with updates that keep you in control.</p>
             </div>
-            <div style="text-align:center;padding:1.5rem">
-                <div style="font-size:2rem;color:var(--accent);margin-bottom:1rem"><i
-                        class="fas fa-indian-rupee-sign"></i></div>
-                <h4 style="margin-bottom:0.5rem">Transparent Pricing</h4>
-                <p style="color:var(--muted);font-size:0.85rem">No hidden charges. Quote before we start.</p>
+            <div class="card" style="text-align:center;">
+                <div class="card-icon" style="margin-inline:auto;"><i class="fas fa-indian-rupee-sign"></i></div>
+                <h3>Transparent Pricing</h3>
+                <p>Quotes before work starts, with no hidden charges buried later.</p>
             </div>
-            <div style="text-align:center;padding:1.5rem">
-                <div style="font-size:2rem;color:var(--accent);margin-bottom:1rem"><i class="fas fa-star"></i></div>
-                <h4 style="margin-bottom:0.5rem">4.8★ Rated</h4>
-                <p style="color:var(--muted);font-size:0.85rem">Trusted by 2500+ happy customers</p>
+            <div class="card" style="text-align:center;">
+                <div class="card-icon" style="margin-inline:auto;"><i class="fas fa-star"></i></div>
+                <h3>4.8 Rated</h3>
+                <p>Trusted by thousands of riders who expect premium care from their garage.</p>
             </div>
         </div>
     </section>
 
-    <!-- Shop Teaser -->
-    <section style="background:var(--bg2)">
+    <section style="background:linear-gradient(180deg, rgba(230,57,70,0.04), transparent);">
         <div class="section-header">
-            <span class="eyebrow">Our Shop</span>
-            <h2>Spare Parts & <span>Accessories</span></h2>
-            <p>Quality parts for all major Indian bike brands</p>
+            <span class="eyebrow">Parts grid</span>
+            <h2>Spare parts and <span>performance accessories</span></h2>
+            <p>Browse fast-moving inventory for major Indian motorcycle platforms.</p>
         </div>
         <div id="featured-products" class="grid-4">
             <div class="loading-center">
                 <div class="spinner"></div>
             </div>
         </div>
-        <div style="text-align:center;margin-top:2.5rem">
+        <div style="text-align:center;margin-top:2.5rem;">
             <a href="/shop.html" class="btn btn-primary">View All Products <i class="fas fa-arrow-right"></i></a>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section style="text-align:center;background:linear-gradient(135deg,rgba(230,57,70,0.08),transparent)">
-        <span class="eyebrow">Ready to Ride Smooth?</span>
-        <h2 style="font-size:2.5rem;font-weight:800;margin:0.75rem 0">Book Your Service <span
-                class="text-accent">Today</span></h2>
-        <p style="color:var(--muted);max-width:420px;margin:0 auto 2rem">Pick a date, choose your service, pay online —
-            we'll have your bike running like new.</p>
-        <a href="/booking.html" class="btn btn-primary" style="padding:14px 36px;font-size:1rem"><i
-                class="fas fa-calendar-check"></i> Schedule Now</a>
+    <section style="text-align:center;">
+        <span class="eyebrow">Ready to roll</span>
+        <h2 style="font-size:clamp(2.1rem,5vw,3.4rem);font-weight:800;margin-top:18px;">Book your next <span
+                class="text-accent">service window</span></h2>
+        <p style="color:rgba(240,240,240,0.72);max-width:560px;margin:16px auto 0;">Choose your date, lock in the
+            service type, and move from diagnosis to ride-ready with a workshop experience that feels deliberate at
+            every touchpoint.</p>
+        <div style="margin-top:30px;">
+            <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Schedule Now</a>
+        </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
                 <div class="logo">SAM<span>MOTO</span></div>
-                <p>Dharamshala's trusted motorcycle workshop since 2016. Genuine parts, expert mechanics, honest prices.
-                </p>
+                <p>Dharamshala's trusted motorcycle workshop since 2016. Genuine parts, sharp diagnostics, and
+                    rider-first care for every machine that enters the bay.</p>
             </div>
             <div class="footer-col">
                 <h4>Services</h4>
@@ -195,28 +336,64 @@
             </div>
             <div class="footer-col">
                 <h4>Contact</h4>
-                <a href="tel:+919876543210"><i class="fas fa-phone" style="width:14px"></i> +91 98765 43210</a>
-                <a href="mailto:info@sammoto.in"><i class="fas fa-envelope" style="width:14px"></i> info@sammoto.in</a>
-                <a href="#"><i class="fas fa-location-dot" style="width:14px"></i> Vpo Malan, Near Main Chowk Malan,
-                    Mandi Palampur Road, Ram Nagar, Dharamshala-176215, Himachal Pradesh</a>
+                <a href="tel:+919876543210"><i class="fas fa-phone"></i> +91 98765 43210</a>
+                <a href="mailto:info@sammoto.in"><i class="fas fa-envelope"></i> info@sammoto.in</a>
+                <a href="#"><i class="fas fa-location-dot"></i> VPO Malan, Near Main Chowk Malan, Mandi Palampur Road,
+                    Dharamshala 176215, Himachal Pradesh</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2025 SamMoto. All rights reserved.</span>
-            <span>Made with <i class="fas fa-heart text-accent"></i> for riders</span>
+            <span>&copy; 2025 SamMoto. All rights reserved.</span>
+            <span>Crafted for riders who expect more from their garage.</span>
         </div>
     </footer>
 
     <script src="/js/auth.js"></script>
     <script src="/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="/js/service-cards.js" defer></script>
+    <script src="/js/animations.js" defer></script>
     <script>
+        let homepageWorkflow = null;
+        let activeWorkflowFilter = 'Pending';
+
         document.addEventListener('DOMContentLoaded', async () => {
+            bindWorkflowFilters();
+            await Promise.allSettled([loadHomepageWorkflow(), loadFeaturedProducts()]);
+        });
+
+        function bindWorkflowFilters() {
+            document.querySelectorAll('[data-status-filter]').forEach(button => {
+                button.addEventListener('click', () => {
+                    activeWorkflowFilter = button.dataset.statusFilter;
+                    renderWorkflowFilterState();
+                    renderWorkflowLane();
+                });
+            });
+        }
+
+        function renderWorkflowFilterState() {
+            const fill = document.querySelector('.hero-timeline-fill');
+            const fillTargets = {
+                Pending: 0.25,
+                Confirmed: 0.5,
+                'In Progress': 0.75,
+                Completed: 1
+            };
+            document.querySelectorAll('[data-status-filter]').forEach(button => {
+                button.classList.toggle('is-active', button.dataset.statusFilter === activeWorkflowFilter);
+            });
+            if (fill) fill.dataset.targetScale = String(fillTargets[activeWorkflowFilter] || 0.25);
+        }
+
+        async function loadFeaturedProducts() {
             try {
                 const res = await fetch('/api/products?category=all');
                 const data = await res.json();
                 const grid = document.getElementById('featured-products');
                 if (!Array.isArray(data) || data.length === 0) {
-                    grid.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">Shop coming soon!</p>';
+                    grid.innerHTML = '<p style="color:rgba(240,240,240,0.68);text-align:center;grid-column:1/-1;">Shop coming soon.</p>';
                     return;
                 }
                 grid.innerHTML = data.slice(0, 4).map(p => `
@@ -226,16 +403,125 @@
                     <div class="product-cat">${p.category}</div>
                     <div class="product-title">${p.title}</div>
                     <div class="product-desc">${(p.description || '').substring(0, 55)}...</div>
+                    <div class="stock-indicator ${p.stock < 3 ? 'is-low' : p.stock < 10 ? 'is-medium' : 'is-high'}">${p.stock < 3 ? 'Low stock' : p.stock < 10 ? 'Limited stock' : 'In stock'}</div>
                     <div class="product-footer">
-                        <div class="product-price">₹${p.price.toFixed(2)}</div>
+                        <div class="product-price">&#8377;${p.price.toFixed(2)}</div>
                         <a href="/shop.html" class="btn btn-primary btn-sm">View</a>
                     </div>
                 </div>
             </div>`).join('');
             } catch (_) {
-                document.getElementById('featured-products').innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">Unable to load products.</p>';
+                document.getElementById('featured-products').innerHTML = '<p style="color:rgba(240,240,240,0.68);text-align:center;grid-column:1/-1;">Unable to load products.</p>';
             }
-        });
+        }
+
+        async function loadHomepageWorkflow() {
+            try {
+                const res = await fetch('/api/bookings/live-workflow');
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load workflow.');
+                homepageWorkflow = data;
+                hydrateWorkflowStats(data);
+                hydrateSignalBars(data.signalSeries || []);
+                pickBestWorkflowFilter(data.stats || {});
+                renderWorkflowFilterState();
+                renderWorkflowLane();
+            } catch (_) {
+                document.getElementById('hero-summary').textContent = 'Live workflow could not be loaded right now.';
+                document.getElementById('hero-panel-badge').textContent = 'Offline';
+                document.getElementById('hero-board-meta').textContent = 'Database sync unavailable';
+                document.getElementById('hero-lane-list').innerHTML = '<div class="hero-lane-empty">Unable to load live workflow.</div>';
+                document.getElementById('hero-floating-open-copy').textContent = 'The workflow panel will update once the API is reachable.';
+                document.getElementById('hero-floating-team-copy').textContent = 'Mechanic availability could not be fetched.';
+            }
+        }
+
+        function hydrateWorkflowStats(data) {
+            const stats = data.stats || {};
+            document.getElementById('hero-stat-total').textContent = formatCount(stats.totalBookings);
+            document.getElementById('hero-stat-mechanics').textContent = formatCount(stats.mechanicsTotal);
+            document.getElementById('hero-stat-completed').textContent = formatCount(stats.completed);
+            document.getElementById('hero-telemetry-value').textContent = formatCount(stats.openBookings);
+            document.getElementById('hero-panel-badge').textContent = 'Live from DB';
+            document.getElementById('hero-board-meta').textContent = `${formatCount(stats.mechanicsAvailable)} available / ${formatCount(stats.mechanicsBusy)} busy`;
+            document.getElementById('hero-summary').textContent = `${formatCount(stats.pending)} pending, ${formatCount(stats.confirmed)} confirmed, and ${formatCount(stats.inProgress)} currently in progress.`;
+            document.getElementById('hero-available-mechanics').textContent = formatCount(stats.mechanicsAvailable);
+            document.getElementById('hero-in-progress').textContent = formatCount(stats.inProgress);
+            document.getElementById('hero-count-pending').textContent = formatCount(stats.pending);
+            document.getElementById('hero-count-confirmed').textContent = formatCount(stats.confirmed);
+            document.getElementById('hero-count-progress').textContent = formatCount(stats.inProgress);
+            document.getElementById('hero-count-completed').textContent = formatCount(stats.completed);
+            document.getElementById('hero-floating-open').textContent = `${formatCount(stats.openBookings)} open bookings`;
+            document.getElementById('hero-floating-open-copy').textContent = `${formatCount(stats.pending)} waiting intake, ${formatCount(stats.confirmed)} approved, ${formatCount(stats.inProgress)} on the floor.`;
+            document.getElementById('hero-floating-team').textContent = `${formatCount(stats.mechanicsAvailable)} mechanics available`;
+            document.getElementById('hero-floating-team-copy').textContent = `${formatCount(stats.mechanicsBusy)} busy and ${formatCount(stats.mechanicsOffDuty)} off duty right now.`;
+        }
+
+        function hydrateSignalBars(series) {
+            const bars = Array.from(document.querySelectorAll('[data-signal-bar]'));
+            const counts = series.map(item => item.count || 0);
+            const maxCount = Math.max(...counts, 1);
+
+            bars.forEach((bar, index) => {
+                const item = series[index] || { count: 0, label: '--' };
+                const ratio = Math.max(0.18, (item.count || 0) / maxCount);
+                bar.style.setProperty('--signal-height', `${Math.max(18, Math.round(ratio * 100))}%`);
+                bar.dataset.baseScale = ratio.toFixed(3);
+                bar.title = `${item.label}: ${item.count} booking${item.count === 1 ? '' : 's'}`;
+            });
+
+            if (series[0]) document.getElementById('hero-signal-start').textContent = series[0].label;
+            if (series[series.length - 1]) document.getElementById('hero-signal-end').textContent = series[series.length - 1].label;
+        }
+
+        function pickBestWorkflowFilter(stats) {
+            const ordered = [
+                ['In Progress', stats.inProgress],
+                ['Confirmed', stats.confirmed],
+                ['Pending', stats.pending],
+                ['Completed', stats.completed]
+            ];
+            const preferred = ordered.find(([, count]) => Number(count) > 0);
+            activeWorkflowFilter = preferred ? preferred[0] : 'Pending';
+        }
+
+        function renderWorkflowLane() {
+            const lane = document.getElementById('hero-lane-list');
+            const caption = document.getElementById('hero-lane-caption');
+            if (!homepageWorkflow) return;
+
+            const filtered = (homepageWorkflow.recentBookings || []).filter(booking => booking.status === activeWorkflowFilter);
+            caption.textContent = `${activeWorkflowFilter} bookings from the live database feed.`;
+
+            if (!filtered.length) {
+                lane.innerHTML = `<div class="hero-lane-empty">No ${activeWorkflowFilter.toLowerCase()} bookings are available right now.</div>`;
+                return;
+            }
+
+            lane.innerHTML = filtered.slice(0, 4).map(booking => `
+                <div class="hero-lane-item">
+                    <div class="hero-lane-main">
+                        <span>${booking.bikeModel}</span>
+                        <small>${booking.bookingCode} · ${booking.serviceType}</small>
+                    </div>
+                    <div class="hero-lane-side">
+                        <strong>${formatWorkflowDate(booking.serviceDate, booking.serviceTime)}</strong>
+                        <small>${booking.mechanicName || booking.status}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatWorkflowDate(date, time) {
+            const value = new Date(date);
+            if (Number.isNaN(value.getTime())) return time || '--';
+            const day = value.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+            return `${day}${time ? ` · ${time}` : ''}`;
+        }
+
+        function formatCount(value) {
+            return Number(value || 0).toLocaleString('en-IN');
+        }
     </script>
 </body>
 

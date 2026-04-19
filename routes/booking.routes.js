@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
+const Mechanic = require('../models/Mechanic');
 const { verifyToken, requireAdmin } = require('../middleware/auth');
 const nodemailer = require('nodemailer');
 
@@ -15,6 +16,22 @@ const transporter = nodemailer.createTransport({
 // ── Helpers ───────────────────────────────────────────────────────────────
 const sanitize = (str, max = 200) => (typeof str === 'string' ? str.trim().substring(0, max) : '');
 const safeErr  = (res, code, msg) => res.status(code).json({ success: false, message: msg });
+const REPORT_TIMEZONE = 'Asia/Kolkata';
+const formatDateKey = (date) => {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: REPORT_TIMEZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(date);
+    const mapped = Object.fromEntries(parts.filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
+    return `${mapped.year}-${mapped.month}-${mapped.day}`;
+};
+const formatDateLabel = (date) => new Intl.DateTimeFormat('en-IN', {
+    timeZone: REPORT_TIMEZONE,
+    day: '2-digit',
+    month: 'short'
+}).format(date);
 
 // POST /api/bookings — create booking (auth required)
 router.post('/', verifyToken, async (req, res) => {
@@ -63,6 +80,125 @@ router.get('/history', verifyToken, async (req, res) => {
     } catch (err) {
         console.error('[booking history]', err.message);
         safeErr(res, 500, 'Failed to load bookings.');
+    }
+});
+
+// GET /api/bookings/live-workflow — public homepage workflow summary
+router.get('/live-workflow', async (req, res) => {
+    try {
+        const now = new Date();
+        const chartStart = new Date(now);
+        chartStart.setHours(0, 0, 0, 0);
+        chartStart.setDate(chartStart.getDate() - 11);
+
+        const [statusBuckets, mechanicBuckets, recentBookings, chartBuckets] = await Promise.all([
+            Booking.aggregate([
+                { $group: { _id: '$status', count: { $sum: 1 } } }
+            ]),
+            Mechanic.aggregate([
+                { $group: { _id: '$status', count: { $sum: 1 } } }
+            ]),
+            Booking.find({ status: { $in: ['Pending', 'Confirmed', 'In Progress', 'Completed'] } })
+                .select('bookingCode bikeModel serviceType status serviceDate serviceTime mechanic createdAt')
+                .populate('mechanic', 'name')
+                .sort({ serviceDate: 1, createdAt: -1 })
+                .limit(18)
+                .lean(),
+            Booking.aggregate([
+                { $match: { createdAt: { $gte: chartStart } } },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: {
+                                format: '%Y-%m-%d',
+                                date: '$createdAt',
+                                timezone: REPORT_TIMEZONE
+                            }
+                        },
+                        count: { $sum: 1 }
+                    }
+                },
+                { $sort: { _id: 1 } }
+            ])
+        ]);
+
+        const statusCounts = {
+            pending: 0,
+            confirmed: 0,
+            inProgress: 0,
+            completed: 0,
+            cancelled: 0
+        };
+        statusBuckets.forEach(({ _id, count }) => {
+            if (_id === 'Pending') statusCounts.pending = count;
+            if (_id === 'Confirmed') statusCounts.confirmed = count;
+            if (_id === 'In Progress') statusCounts.inProgress = count;
+            if (_id === 'Completed') statusCounts.completed = count;
+            if (_id === 'Cancelled') statusCounts.cancelled = count;
+        });
+
+        const mechanicCounts = {
+            available: 0,
+            busy: 0,
+            offDuty: 0
+        };
+        mechanicBuckets.forEach(({ _id, count }) => {
+            if (_id === 'Available') mechanicCounts.available = count;
+            if (_id === 'Busy') mechanicCounts.busy = count;
+            if (_id === 'Off Duty') mechanicCounts.offDuty = count;
+        });
+
+        const totalBookings = Object.values(statusCounts).reduce((sum, value) => sum + value, 0);
+        const openBookings = statusCounts.pending + statusCounts.confirmed + statusCounts.inProgress;
+        const mechanicsTotal = Object.values(mechanicCounts).reduce((sum, value) => sum + value, 0);
+
+        const chartMap = new Map(chartBuckets.map(bucket => [bucket._id, bucket.count]));
+        const signalSeries = [];
+        for (let offset = 11; offset >= 0; offset -= 1) {
+            const date = new Date(now);
+            date.setHours(0, 0, 0, 0);
+            date.setDate(date.getDate() - offset);
+            const key = formatDateKey(date);
+            signalSeries.push({
+                key,
+                label: formatDateLabel(date),
+                count: chartMap.get(key) || 0
+            });
+        }
+
+        const formattedBookings = recentBookings.map(booking => ({
+            id: String(booking._id),
+            bookingCode: booking.bookingCode,
+            bikeModel: booking.bikeModel,
+            serviceType: booking.serviceType,
+            status: booking.status,
+            serviceDate: booking.serviceDate,
+            serviceTime: booking.serviceTime || '10:00',
+            mechanicName: booking.mechanic?.name || null
+        }));
+
+        res.json({
+            success: true,
+            generatedAt: now.toISOString(),
+            stats: {
+                totalBookings,
+                openBookings,
+                pending: statusCounts.pending,
+                confirmed: statusCounts.confirmed,
+                inProgress: statusCounts.inProgress,
+                completed: statusCounts.completed,
+                cancelled: statusCounts.cancelled,
+                mechanicsTotal,
+                mechanicsAvailable: mechanicCounts.available,
+                mechanicsBusy: mechanicCounts.busy,
+                mechanicsOffDuty: mechanicCounts.offDuty
+            },
+            signalSeries,
+            recentBookings: formattedBookings
+        });
+    } catch (err) {
+        console.error('[booking live workflow]', err.message);
+        safeErr(res, 500, 'Failed to load live workflow.');
     }
 });
 

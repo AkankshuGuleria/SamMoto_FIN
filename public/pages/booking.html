@@ -1,39 +1,132 @@
 <!DOCTYPE html>
+<!-- Frontend redesign: refreshed the booking flow with the shared immersive shell and animated stepper while preserving all existing booking IDs and payment logic. -->
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Service — SamMoto</title>
+    <title>Book Service - SamMoto</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/service-cards.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 <body>
+    <div class="page-transition" id="page-transition"></div>
+
+    <div id="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-gauge">
+                <svg viewBox="0 0 240 240" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="samMotoRevGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#7a0f18"></stop>
+                            <stop offset="55%" stop-color="#e63946"></stop>
+                            <stop offset="100%" stop-color="#ff7b85"></stop>
+                        </linearGradient>
+                    </defs>
+                    <circle class="preloader-track" cx="120" cy="120" r="82"></circle>
+                    <circle class="preloader-arc" cx="120" cy="120" r="82"></circle>
+                </svg>
+                <div class="preloader-rpm">
+                    <strong>9.5K</strong>
+                    <span>Rev Limit</span>
+                </div>
+            </div>
+            <div class="preloader-word" aria-label="SAMMOTO">
+                <span>S</span>
+                <span>A</span>
+                <span>M</span>
+                <span class="accent">M</span>
+                <span class="accent">O</span>
+                <span class="accent">T</span>
+                <span class="accent">O</span>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar">
         <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
         <ul class="nav-links" id="nav-links"></ul>
         <div class="nav-right" id="nav-right"></div>
     </nav>
+    <!-- Service Overview Section -->
+    <section class="service-overview" id="service-overview">
+        <div class="overview-summary">
+            <div class="queue-status card">
+                <h3>Queue</h3>
+                <p>0 open bookings</p>
+                <p>0 waiting intake, 0 approved, 0 on the floor.</p>
+            </div>
+            <div class="team-status card">
+                <h3>Team status</h3>
+                <p>0 mechanics available</p>
+                <p>0 busy and 0 off duty right now.</p>
+            </div>
+        </div>
+        <div class="service-cards">
+            <div class="service-card" data-service="General Service" data-price="599">
+                <h4>General Service</h4>
+                <p>Full health check, oil change, tune-up, consumables, and riding‑performance inspection.</p>
+                <span class="price">Starting ₹599</span>
+            </div>
+            <div class="service-card" data-service="Engine Overhaul" data-price="3999">
+                <h4>Engine Overhaul</h4>
+                <p>Compression testing, tear‑downs, rebuilds, and precision replacement for serious mechanical recovery.
+                </p>
+                <span class="price">Starting ₹3999</span>
+            </div>
+            <div class="service-card" data-service="Tyres and Brakes" data-price="299">
+                <h4>Tyres and Brakes</h4>
+                <p>Grip, stopping power, balancing, pad swaps, and brake servicing tuned for safer aggressive riding.
+                </p>
+                <span class="price">Starting ₹299</span>
+            </div>
+            <div class="service-card" data-service="Electrical and Wiring" data-price="199">
+                <h4>Electrical and Wiring</h4>
+                <p>Battery diagnostics, charging systems, lighting, wiring recovery, and electrical fault tracing.</p>
+                <span class="price">Starting ₹199</span>
+            </div>
+            <div class="service-card" data-service="Suspension Setup" data-price="799">
+                <h4>Suspension Setup</h4>
+                <p>Fork servicing, shock tuning, and chassis corrections for sharper confidence in every corner.</p>
+                <span class="price">Starting ₹799</span>
+            </div>
+            <div class="service-card" data-service="Bodywork and Paint" data-price="1499">
+                <h4>Bodywork and Paint</h4>
+                <p>Dent repair, restoration, detailing, and custom finishes that make your bike feel showroom fresh.</p>
+                <span class="price">Starting ₹1499</span>
+            </div>
+        </div>
+    </section>
+
 
     <div class="booking-page">
         <div class="booking-container">
-            <h2>Schedule a <span class="text-accent">Service</span></h2>
-            <p class="sub">Fill in your details and we'll confirm your slot.</p>
+            <span class="eyebrow">Service booking</span>
+            <h2>Schedule a <span class="text-accent">precision workshop slot</span></h2>
+            <p class="sub">Move from diagnostics to payment in a guided three-step flow designed to feel like a premium
+                service console.</p>
 
             <div class="booking-steps">
-                <div class="step-dot active" id="step1-dot"></div>
-                <div class="step-dot" id="step2-dot"></div>
-                <div class="step-dot" id="step3-dot"></div>
+                <div class="step-pill">
+                    <div class="step-dot active" id="step1-dot">1</div>
+                    <div class="step-label">Vehicle</div>
+                </div>
+                <div class="step-pill">
+                    <div class="step-dot" id="step2-dot">2</div>
+                    <div class="step-label">Review</div>
+                </div>
+                <div class="step-pill">
+                    <div class="step-dot" id="step3-dot">3</div>
+                    <div class="step-label">Payment</div>
+                </div>
             </div>
 
-            <!-- Step 1: Vehicle -->
             <div id="step1">
                 <div class="booking-section">
-                    <h4><i class="fas fa-motorcycle text-accent"></i> &nbsp; Vehicle Details</h4>
+                    <h4><i class="fas fa-motorcycle text-accent"></i> Vehicle details</h4>
                     <div class="form-row">
                         <div class="input-group">
                             <label>Bike Model</label>
@@ -87,20 +180,21 @@
                                 </optgroup>
                                 <option value="Other">Other</option>
                             </select>
-                            <div class="input-group" id="otherBikeGroup" style="display:none; margin-top:0.75rem;">
-                                <label>Your Bike Name & Model</label>
-                                <input type="text" id="otherBikeInput" placeholder="e.g. Hero Karizma XMR">
+                            <div class="input-group" id="otherBikeGroup" style="display:none;margin-top:0.75rem;">
+                                <label>Your Bike Name and Model</label>
+                                <input type="text" id="otherBikeInput" placeholder="For example Hero Karizma XMR">
                             </div>
                         </div>
                         <div class="input-group">
                             <label>Registration Number</label>
-                            <input type="text" id="regNumber" placeholder="PB-10-XXXX" style="text-transform:uppercase">
+                            <input type="text" id="regNumber" placeholder="PB-10-XXXX"
+                                style="text-transform:uppercase;">
                         </div>
                     </div>
                 </div>
 
                 <div class="booking-section">
-                    <h4><i class="fas fa-wrench text-accent"></i> &nbsp; Service Details</h4>
+                    <h4><i class="fas fa-wrench text-accent"></i> Service details</h4>
                     <div class="form-row">
                         <div class="input-group">
                             <label>Service Type</label>
@@ -134,7 +228,7 @@
                         </select>
                     </div>
                     <div class="input-group">
-                        <label>Additional Notes (optional)</label>
+                        <label>Additional Notes</label>
                         <textarea id="notes" placeholder="Describe any specific issues or requests..."></textarea>
                     </div>
                 </div>
@@ -143,42 +237,40 @@
                 </button>
             </div>
 
-            <!-- Step 2: Cart Review -->
             <div id="step2" class="hidden">
                 <div class="booking-section">
-                    <h4><i class="fas fa-shopping-cart text-accent"></i> &nbsp; Items in your Job Card</h4>
+                    <h4><i class="fas fa-shopping-cart text-accent"></i> Items in your job card</h4>
                     <div id="cart-review"></div>
                     <a href="/shop.html"
-                        style="font-size:0.85rem;color:var(--accent);display:inline-flex;align-items:center;gap:6px;margin-top:0.75rem">
+                        style="font-size:0.82rem;color:var(--accent);display:inline-flex;align-items:center;gap:6px;margin-top:0.75rem;letter-spacing:0.14em;text-transform:uppercase;">
                         <i class="fas fa-plus"></i> Add more from shop
                     </a>
                 </div>
                 <div class="booking-section">
-                    <h4><i class="fas fa-receipt text-accent"></i> &nbsp; Cost Summary</h4>
-                    <div class="summary-row"><span class="label" style="color:var(--muted)">Parts &
-                            Accessories</span><span id="parts-cost">₹0.00</span></div>
-                    <div class="summary-row"><span class="label" style="color:var(--muted)">Labour &
-                            Services</span><span id="labour-cost">₹0.00</span></div>
-                    <div class="summary-row total mt-2" style="font-size:1.1rem"><span>Total</span><span
-                            class="text-accent" id="total-cost">₹0.00</span></div>
+                    <h4><i class="fas fa-receipt text-accent"></i> Cost summary</h4>
+                    <div class="summary-row"><span class="label">Parts and Accessories</span><span
+                            id="parts-cost">&#8377;0.00</span></div>
+                    <div class="summary-row"><span class="label">Labour and Services</span><span
+                            id="labour-cost">&#8377;0.00</span></div>
+                    <div class="summary-row total mt-2" style="font-size:1.1rem;"><span>Total</span><span
+                            class="text-accent" id="total-cost">&#8377;0.00</span></div>
                 </div>
-                <div style="display:flex;gap:1rem">
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
                     <button class="btn btn-secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i>
                         Back</button>
-                    <button class="btn btn-primary" onclick="goStep3()">Confirm & Pay <i
+                    <button class="btn btn-primary" onclick="goStep3()">Confirm and Pay <i
                             class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
 
-            <!-- Step 3: Confirm & Pay -->
             <div id="step3" class="hidden">
                 <div class="booking-section">
-                    <h4><i class="fas fa-check-circle text-accent"></i> &nbsp; Booking Summary</h4>
-                    <div id="booking-summary" style="font-size:0.9rem;line-height:2"></div>
+                    <h4><i class="fas fa-check-circle text-accent"></i> Booking summary</h4>
+                    <div id="booking-summary" style="font-size:0.9rem;line-height:2;"></div>
                 </div>
                 <div class="booking-section">
-                    <h4><i class="fas fa-credit-card text-accent"></i> &nbsp; Payment</h4>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+                    <h4><i class="fas fa-credit-card text-accent"></i> Payment</h4>
+                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.75rem;">
                         <button id="pay-online-btn" class="btn btn-primary" onclick="payOnline()">
                             <i class="fas fa-mobile-alt"></i> Pay Online (Razorpay)
                         </button>
@@ -186,25 +278,23 @@
                             <i class="fas fa-store"></i> Pay at Workshop
                         </button>
                     </div>
-                    <p style="font-size:0.78rem;color:var(--muted);margin-top:0.75rem">
-                        <i class="fas fa-shield-halved text-accent"></i> Payments secured by Razorpay. Your data is
-                        safe.
+                    <p style="font-size:0.78rem;color:rgba(240,240,240,0.68);margin-top:0.75rem;">
+                        <i class="fas fa-shield-halved text-accent"></i> Payments secured by Razorpay.
                     </p>
                 </div>
                 <button class="btn btn-secondary btn-sm" onclick="goStep(2)"><i class="fas fa-arrow-left"></i>
                     Back</button>
             </div>
 
-            <!-- Success -->
-            <div id="step-success" class="hidden booking-section" style="text-align:center;padding:3rem">
-                <div style="font-size:3.5rem;color:var(--success);margin-bottom:1rem"><i
+            <div id="step-success" class="hidden booking-section" style="text-align:center;padding:3rem;">
+                <div style="font-size:3.5rem;color:var(--success);margin-bottom:1rem;"><i
                         class="fas fa-check-circle"></i></div>
-                <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:0.5rem">Booking Confirmed!</h3>
-                <p style="color:var(--muted);margin-bottom:1rem">Your booking code: <strong id="booking-code"
+                <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:0.5rem;">Booking Confirmed!</h3>
+                <p style="color:rgba(240,240,240,0.68);margin-bottom:1rem;">Your booking code: <strong id="booking-code"
                         class="text-accent"></strong></p>
-                <p style="color:var(--muted);font-size:0.88rem;margin-bottom:2rem">We'll call you to confirm the slot.
-                    See you soon!</p>
-                <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+                <p style="color:rgba(240,240,240,0.68);font-size:0.88rem;margin-bottom:2rem;">We will call you to
+                    confirm the slot. See you soon.</p>
+                <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
                     <a href="/cust_dashboard.html" class="btn btn-primary">My Bookings</a>
                     <a href="/index.html" class="btn btn-secondary">Back to Home</a>
                 </div>
@@ -214,11 +304,13 @@
 
     <script src="/js/auth.js"></script>
     <script src="/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="/js/service-cards.js" defer></script>
+    <script src="/js/animations.js" defer></script>
     <script>
-        // Require login
         if (!Auth.requireAuth()) { }
 
-        // Set minimum date to tomorrow
         const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
         document.getElementById('serviceDate').min = tomorrow.toISOString().split('T')[0];
 
@@ -251,15 +343,15 @@
             const cart = getCart();
             const el = document.getElementById('cart-review');
             if (cart.length === 0) {
-                el.innerHTML = `<p style="color:var(--muted);font-size:0.88rem">No items added. You can add spare parts from the shop.</p>`;
+                el.innerHTML = '<p style="color:rgba(240,240,240,0.68);font-size:0.88rem;">No items added. You can add spare parts from the shop.</p>';
             } else {
                 el.innerHTML = cart.map(i => `
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="display:flex;align-items:center;gap:10px">
-                    <i class="fas ${i.icon || 'fa-box'}" style="color:var(--accent)"></i>
-                    <span style="font-size:0.9rem">${i.name} <span style="color:var(--muted)">x${i.qty || 1}</span></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.08);gap:12px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <i class="fas ${i.icon || 'fa-box'}" style="color:var(--accent);"></i>
+                    <span style="font-size:0.9rem;">${i.name} <span style="color:var(--muted-2);">x${i.qty || 1}</span></span>
                 </div>
-                <span style="font-weight:600">₹${(parseFloat(i.price) * (i.qty || 1)).toFixed(2)}</span>
+                <span style="font-weight:600;">&#8377;${(parseFloat(i.price) * (i.qty || 1)).toFixed(2)}</span>
             </div>`).join('');
             }
 
@@ -280,13 +372,13 @@
             const total = partsCost + laborCost;
 
             document.getElementById('booking-summary').innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
-            <span style="color:var(--muted)">Bike</span><span>${document.getElementById('bikeModel').value === 'Other' ? document.getElementById('otherBikeInput').value : document.getElementById('bikeModel').value}</span>
-            <span style="color:var(--muted)">Reg. No.</span><span>${document.getElementById('regNumber').value.toUpperCase()}</span>
-            <span style="color:var(--muted)">Service</span><span>${document.getElementById('serviceType').value}</span>
-            <span style="color:var(--muted)">Date</span><span>${(() => { const [y, m, d] = document.getElementById('serviceDate').value.split('-'); return new Date(+y, +m - 1, +d).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }); })()}</span>
-            <span style="color:var(--muted)">Time</span><span>${document.getElementById('serviceTime').value}</span>
-            <span style="color:var(--muted)">Total</span><span class="text-accent" style="font-weight:700">₹${total.toFixed(2)}</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+            <span style="color:var(--muted-2);">Bike</span><span>${document.getElementById('bikeModel').value === 'Other' ? document.getElementById('otherBikeInput').value : document.getElementById('bikeModel').value}</span>
+            <span style="color:var(--muted-2);">Reg. No.</span><span>${document.getElementById('regNumber').value.toUpperCase()}</span>
+            <span style="color:var(--muted-2);">Service</span><span>${document.getElementById('serviceType').value}</span>
+            <span style="color:var(--muted-2);">Date</span><span>${(() => { const [y, m, d] = document.getElementById('serviceDate').value.split('-'); return new Date(+y, +m - 1, +d).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }); })()}</span>
+            <span style="color:var(--muted-2);">Time</span><span>${document.getElementById('serviceTime').value}</span>
+            <span style="color:var(--muted-2);">Total</span><span class="text-accent" style="font-weight:700;">&#8377;${total.toFixed(2)}</span>
         </div>`;
             goStep(3);
         }
@@ -340,7 +432,6 @@
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening payment...';
 
             try {
-                // Create booking first
                 const bRes = await fetch('/api/bookings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
@@ -354,7 +445,6 @@
 
                 if (total <= 0) { await completeBooking(bookingId, null, null); return; }
 
-                // Create Razorpay order
                 const oRes = await fetch('/api/payments/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
@@ -374,7 +464,6 @@
                     prefill: { name: auth.name, email: auth.email },
                     theme: { color: '#e63946' },
                     handler: async (response) => {
-                        // Verify payment
                         await fetch('/api/payments/verify', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
