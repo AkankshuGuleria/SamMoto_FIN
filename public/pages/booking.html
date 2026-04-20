@@ -51,253 +51,270 @@
         <ul class="nav-links" id="nav-links"></ul>
         <div class="nav-right" id="nav-right"></div>
     </nav>
-    <!-- Service Overview Section -->
-    <section class="service-overview" id="service-overview">
-        <div class="overview-summary">
-            <div class="queue-status card">
-                <h3>Queue</h3>
-                <p>0 open bookings</p>
-                <p>0 waiting intake, 0 approved, 0 on the floor.</p>
-            </div>
-            <div class="team-status card">
-                <h3>Team status</h3>
-                <p>0 mechanics available</p>
-                <p>0 busy and 0 off duty right now.</p>
-            </div>
-        </div>
-        <div class="service-cards">
-            <div class="service-card" data-service="General Service" data-price="599">
-                <h4>General Service</h4>
-                <p>Full health check, oil change, tune-up, consumables, and riding‑performance inspection.</p>
-                <span class="price">Starting ₹599</span>
-            </div>
-            <div class="service-card" data-service="Engine Overhaul" data-price="3999">
-                <h4>Engine Overhaul</h4>
-                <p>Compression testing, tear‑downs, rebuilds, and precision replacement for serious mechanical recovery.
-                </p>
-                <span class="price">Starting ₹3999</span>
-            </div>
-            <div class="service-card" data-service="Tyres and Brakes" data-price="299">
-                <h4>Tyres and Brakes</h4>
-                <p>Grip, stopping power, balancing, pad swaps, and brake servicing tuned for safer aggressive riding.
-                </p>
-                <span class="price">Starting ₹299</span>
-            </div>
-            <div class="service-card" data-service="Electrical and Wiring" data-price="199">
-                <h4>Electrical and Wiring</h4>
-                <p>Battery diagnostics, charging systems, lighting, wiring recovery, and electrical fault tracing.</p>
-                <span class="price">Starting ₹199</span>
-            </div>
-            <div class="service-card" data-service="Suspension Setup" data-price="799">
-                <h4>Suspension Setup</h4>
-                <p>Fork servicing, shock tuning, and chassis corrections for sharper confidence in every corner.</p>
-                <span class="price">Starting ₹799</span>
-            </div>
-            <div class="service-card" data-service="Bodywork and Paint" data-price="1499">
-                <h4>Bodywork and Paint</h4>
-                <p>Dent repair, restoration, detailing, and custom finishes that make your bike feel showroom fresh.</p>
-                <span class="price">Starting ₹1499</span>
-            </div>
-        </div>
-    </section>
+    <div style="padding-top: 100px;"></div>
+    <div class="booking-layout-wrapper"
+        style="display: flex; gap: 2rem; max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; flex-wrap: wrap; align-items: flex-start;">
 
+        <!-- Left Side: Booking Form -->
+        <div class="booking-page" style="flex: 1 1 600px; padding: 0; margin: 0; box-shadow: none;">
+            <div class="booking-container">
+                <span class="eyebrow">Service booking</span>
+                <h2>Schedule a <span class="text-accent">precision workshop slot</span></h2>
+                <p class="sub">Move from diagnostics to payment in a guided three-step flow designed to feel like a
+                    premium
+                    service console.</p>
 
-    <div class="booking-page">
-        <div class="booking-container">
-            <span class="eyebrow">Service booking</span>
-            <h2>Schedule a <span class="text-accent">precision workshop slot</span></h2>
-            <p class="sub">Move from diagnostics to payment in a guided three-step flow designed to feel like a premium
-                service console.</p>
-
-            <div class="booking-steps">
-                <div class="step-pill">
-                    <div class="step-dot active" id="step1-dot">1</div>
-                    <div class="step-label">Vehicle</div>
+                <div class="booking-steps">
+                    <div class="step-pill">
+                        <div class="step-dot active" id="step1-dot">1</div>
+                        <div class="step-label">Vehicle</div>
+                    </div>
+                    <div class="step-pill">
+                        <div class="step-dot" id="step2-dot">2</div>
+                        <div class="step-label">Review</div>
+                    </div>
+                    <div class="step-pill">
+                        <div class="step-dot" id="step3-dot">3</div>
+                        <div class="step-label">Payment</div>
+                    </div>
                 </div>
-                <div class="step-pill">
-                    <div class="step-dot" id="step2-dot">2</div>
-                    <div class="step-label">Review</div>
-                </div>
-                <div class="step-pill">
-                    <div class="step-dot" id="step3-dot">3</div>
-                    <div class="step-label">Payment</div>
-                </div>
-            </div>
 
-            <div id="step1">
-                <div class="booking-section">
-                    <h4><i class="fas fa-motorcycle text-accent"></i> Vehicle details</h4>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label>Bike Model</label>
-                            <select id="bikeModel" onchange="toggleOtherBike()">
-                                <option value="" disabled selected>Select your bike</option>
-                                <optgroup label="Royal Enfield">
-                                    <option>RE Classic 350</option>
-                                    <option>RE Bullet 350</option>
-                                    <option>RE Meteor 350</option>
-                                    <option>RE Hunter 350</option>
-                                    <option>RE Himalayan 450</option>
-                                    <option>RE Interceptor 650</option>
-                                </optgroup>
-                                <optgroup label="KTM">
-                                    <option>KTM Duke 125</option>
-                                    <option>KTM Duke 200</option>
-                                    <option>KTM Duke 390</option>
-                                    <option>KTM RC 390</option>
-                                </optgroup>
-                                <optgroup label="Bajaj">
-                                    <option>Bajaj Pulsar 150</option>
-                                    <option>Bajaj Pulsar NS200</option>
-                                    <option>Bajaj Dominar 400</option>
-                                </optgroup>
-                                <optgroup label="Yamaha">
-                                    <option>Yamaha R15 V4</option>
-                                    <option>Yamaha MT-15 V2</option>
-                                    <option>Yamaha FZ-S FI</option>
-                                    <option>Yamaha FZ25</option>
-                                </optgroup>
-                                <optgroup label="TVS">
-                                    <option>TVS Apache RTR 160 4V</option>
-                                    <option>TVS Apache RTR 200 4V</option>
-                                    <option>TVS Apache RR 310</option>
-                                </optgroup>
-                                <optgroup label="Honda">
-                                    <option>Honda Activa 6G</option>
-                                    <option>Honda Activa 125</option>
-                                    <option>Honda CB300R</option>
-                                    <option>Honda Hness CB350</option>
-                                </optgroup>
-                                <optgroup label="Hero">
-                                    <option>Hero Splendor Plus</option>
-                                    <option>Hero Xtreme 160R</option>
-                                    <option>Hero Xpulse 200 4V</option>
-                                </optgroup>
-                                <optgroup label="Suzuki">
-                                    <option>Suzuki Gixxer</option>
-                                    <option>Suzuki Gixxer SF</option>
-                                    <option>Suzuki Access 125</option>
-                                </optgroup>
-                                <option value="Other">Other</option>
-                            </select>
-                            <div class="input-group" id="otherBikeGroup" style="display:none;margin-top:0.75rem;">
-                                <label>Your Bike Name and Model</label>
-                                <input type="text" id="otherBikeInput" placeholder="For example Hero Karizma XMR">
+                <div id="step1">
+                    <div class="booking-section">
+                        <h4><i class="fas fa-motorcycle text-accent"></i> Vehicle details</h4>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Bike Model</label>
+                                <select id="bikeModel" onchange="toggleOtherBike()">
+                                    <option value="" disabled selected>Select your bike</option>
+                                    <optgroup label="Royal Enfield">
+                                        <option>RE Classic 350</option>
+                                        <option>RE Bullet 350</option>
+                                        <option>RE Meteor 350</option>
+                                        <option>RE Hunter 350</option>
+                                        <option>RE Himalayan 450</option>
+                                        <option>RE Interceptor 650</option>
+                                    </optgroup>
+                                    <optgroup label="KTM">
+                                        <option>KTM Duke 125</option>
+                                        <option>KTM Duke 200</option>
+                                        <option>KTM Duke 390</option>
+                                        <option>KTM RC 390</option>
+                                    </optgroup>
+                                    <optgroup label="Bajaj">
+                                        <option>Bajaj Pulsar 150</option>
+                                        <option>Bajaj Pulsar NS200</option>
+                                        <option>Bajaj Dominar 400</option>
+                                    </optgroup>
+                                    <optgroup label="Yamaha">
+                                        <option>Yamaha R15 V4</option>
+                                        <option>Yamaha MT-15 V2</option>
+                                        <option>Yamaha FZ-S FI</option>
+                                        <option>Yamaha FZ25</option>
+                                    </optgroup>
+                                    <optgroup label="TVS">
+                                        <option>TVS Apache RTR 160 4V</option>
+                                        <option>TVS Apache RTR 200 4V</option>
+                                        <option>TVS Apache RR 310</option>
+                                    </optgroup>
+                                    <optgroup label="Honda">
+                                        <option>Honda Activa 6G</option>
+                                        <option>Honda Activa 125</option>
+                                        <option>Honda CB300R</option>
+                                        <option>Honda Hness CB350</option>
+                                    </optgroup>
+                                    <optgroup label="Hero">
+                                        <option>Hero Splendor Plus</option>
+                                        <option>Hero Xtreme 160R</option>
+                                        <option>Hero Xpulse 200 4V</option>
+                                    </optgroup>
+                                    <optgroup label="Suzuki">
+                                        <option>Suzuki Gixxer</option>
+                                        <option>Suzuki Gixxer SF</option>
+                                        <option>Suzuki Access 125</option>
+                                    </optgroup>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div class="input-group" id="otherBikeGroup" style="display:none;margin-top:0.75rem;">
+                                    <label>Your Bike Name and Model</label>
+                                    <input type="text" id="otherBikeInput" placeholder="For example Hero Karizma XMR">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>Registration Number</label>
+                                <input type="text" id="regNumber" placeholder="HP-10-XXXX"
+                                    style="text-transform:uppercase;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-section">
+                        <h4><i class="fas fa-wrench text-accent"></i> Service details</h4>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Service Type</label>
+                                <select id="serviceType">
+                                    <option value="" disabled selected>Choose service</option>
+                                    <option>General Service</option>
+                                    <option>Engine Repair</option>
+                                    <option>Tyre & Brake Service</option>
+                                    <option>Electrical & Wiring</option>
+                                    <option>Suspension Service</option>
+                                    <option>Bodywork & Paint</option>
+                                    <option>Oil Change Only</option>
+                                    <option>Full Overhaul</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Preferred Date</label>
+                                <input type="date" id="serviceDate">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Registration Number</label>
-                            <input type="text" id="regNumber" placeholder="PB-10-XXXX"
-                                style="text-transform:uppercase;">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="booking-section">
-                    <h4><i class="fas fa-wrench text-accent"></i> Service details</h4>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label>Service Type</label>
-                            <select id="serviceType">
-                                <option value="" disabled selected>Choose service</option>
-                                <option>General Service</option>
-                                <option>Engine Repair</option>
-                                <option>Tyre & Brake Service</option>
-                                <option>Electrical & Wiring</option>
-                                <option>Suspension Service</option>
-                                <option>Bodywork & Paint</option>
-                                <option>Oil Change Only</option>
-                                <option>Full Overhaul</option>
+                            <label>Preferred Time Slot</label>
+                            <select id="serviceTime">
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00" selected>10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
                             </select>
                         </div>
                         <div class="input-group">
-                            <label>Preferred Date</label>
-                            <input type="date" id="serviceDate">
+                            <label>Additional Notes</label>
+                            <textarea id="notes" placeholder="Describe any specific issues or requests..."></textarea>
                         </div>
                     </div>
-                    <div class="input-group">
-                        <label>Preferred Time Slot</label>
-                        <select id="serviceTime">
-                            <option value="09:00">9:00 AM</option>
-                            <option value="10:00" selected>10:00 AM</option>
-                            <option value="11:00">11:00 AM</option>
-                            <option value="12:00">12:00 PM</option>
-                            <option value="14:00">2:00 PM</option>
-                            <option value="15:00">3:00 PM</option>
-                            <option value="16:00">4:00 PM</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Additional Notes</label>
-                        <textarea id="notes" placeholder="Describe any specific issues or requests..."></textarea>
-                    </div>
+                    <button class="btn btn-primary" onclick="goStep2()">
+                        Next: Review Cart <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
-                <button class="btn btn-primary" onclick="goStep2()">
-                    Next: Review Cart <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
 
-            <div id="step2" class="hidden">
-                <div class="booking-section">
-                    <h4><i class="fas fa-shopping-cart text-accent"></i> Items in your job card</h4>
-                    <div id="cart-review"></div>
-                    <a href="/shop.html"
-                        style="font-size:0.82rem;color:var(--accent);display:inline-flex;align-items:center;gap:6px;margin-top:0.75rem;letter-spacing:0.14em;text-transform:uppercase;">
-                        <i class="fas fa-plus"></i> Add more from shop
-                    </a>
+                <div id="step2" class="hidden">
+                    <div class="booking-section">
+                        <h4><i class="fas fa-shopping-cart text-accent"></i> Items in your job card</h4>
+                        <div id="cart-review"></div>
+                        <a href="/shop.html"
+                            style="font-size:0.82rem;color:var(--accent);display:inline-flex;align-items:center;gap:6px;margin-top:0.75rem;letter-spacing:0.14em;text-transform:uppercase;">
+                            <i class="fas fa-plus"></i> Add more from shop
+                        </a>
+                    </div>
+                    <div class="booking-section">
+                        <h4><i class="fas fa-receipt text-accent"></i> Cost summary</h4>
+                        <div class="summary-row"><span class="label">Parts and Accessories</span><span
+                                id="parts-cost">&#8377;0.00</span></div>
+                        <div class="summary-row"><span class="label">Labour and Services</span><span
+                                id="labour-cost">&#8377;0.00</span></div>
+                        <div class="summary-row total mt-2" style="font-size:1.1rem;"><span>Total</span><span
+                                class="text-accent" id="total-cost">&#8377;0.00</span></div>
+                    </div>
+                    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                        <button class="btn btn-secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i>
+                            Back</button>
+                        <button class="btn btn-primary" onclick="goStep3()">Confirm and Pay <i
+                                class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
-                <div class="booking-section">
-                    <h4><i class="fas fa-receipt text-accent"></i> Cost summary</h4>
-                    <div class="summary-row"><span class="label">Parts and Accessories</span><span
-                            id="parts-cost">&#8377;0.00</span></div>
-                    <div class="summary-row"><span class="label">Labour and Services</span><span
-                            id="labour-cost">&#8377;0.00</span></div>
-                    <div class="summary-row total mt-2" style="font-size:1.1rem;"><span>Total</span><span
-                            class="text-accent" id="total-cost">&#8377;0.00</span></div>
-                </div>
-                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-                    <button class="btn btn-secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i>
+
+                <div id="step3" class="hidden">
+                    <div class="booking-section">
+                        <h4><i class="fas fa-check-circle text-accent"></i> Booking summary</h4>
+                        <div id="booking-summary" style="font-size:0.9rem;line-height:2;"></div>
+                    </div>
+                    <div class="booking-section">
+                        <h4><i class="fas fa-credit-card text-accent"></i> Payment</h4>
+                        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.75rem;">
+                            <button id="pay-online-btn" class="btn btn-primary" onclick="payOnline()">
+                                <i class="fas fa-mobile-alt"></i> Pay Online (Razorpay)
+                            </button>
+                            <button id="pay-later-btn" class="btn btn-secondary" onclick="bookNow('pay_later')">
+                                <i class="fas fa-store"></i> Pay at Workshop
+                            </button>
+                        </div>
+                        <p style="font-size:0.78rem;color:rgba(240,240,240,0.68);margin-top:0.75rem;">
+                            <i class="fas fa-shield-halved text-accent"></i> Payments secured by Razorpay.
+                        </p>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="goStep(2)"><i class="fas fa-arrow-left"></i>
                         Back</button>
-                    <button class="btn btn-primary" onclick="goStep3()">Confirm and Pay <i
-                            class="fas fa-arrow-right"></i></button>
                 </div>
-            </div>
 
-            <div id="step3" class="hidden">
-                <div class="booking-section">
-                    <h4><i class="fas fa-check-circle text-accent"></i> Booking summary</h4>
-                    <div id="booking-summary" style="font-size:0.9rem;line-height:2;"></div>
-                </div>
-                <div class="booking-section">
-                    <h4><i class="fas fa-credit-card text-accent"></i> Payment</h4>
-                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.75rem;">
-                        <button id="pay-online-btn" class="btn btn-primary" onclick="payOnline()">
-                            <i class="fas fa-mobile-alt"></i> Pay Online (Razorpay)
-                        </button>
-                        <button id="pay-later-btn" class="btn btn-secondary" onclick="bookNow('pay_later')">
-                            <i class="fas fa-store"></i> Pay at Workshop
-                        </button>
+                <div id="step-success" class="hidden booking-section" style="text-align:center;padding:3rem;">
+                    <div style="font-size:3.5rem;color:var(--success);margin-bottom:1rem;"><i
+                            class="fas fa-check-circle"></i></div>
+                    <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:0.5rem;">Booking Confirmed!</h3>
+                    <p style="color:rgba(240,240,240,0.68);margin-bottom:1rem;">Your booking code: <strong
+                            id="booking-code" class="text-accent"></strong></p>
+                    <p style="color:rgba(240,240,240,0.68);font-size:0.88rem;margin-bottom:2rem;">We will call you to
+                        confirm the slot. See you soon.</p>
+                    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                        <a href="/cust_dashboard.html" class="btn btn-primary">My Bookings</a>
+                        <a href="/index.html" class="btn btn-secondary">Back to Home</a>
                     </div>
-                    <p style="font-size:0.78rem;color:rgba(240,240,240,0.68);margin-top:0.75rem;">
-                        <i class="fas fa-shield-halved text-accent"></i> Payments secured by Razorpay.
-                    </p>
                 </div>
-                <button class="btn btn-secondary btn-sm" onclick="goStep(2)"><i class="fas fa-arrow-left"></i>
-                    Back</button>
             </div>
+        </div>
 
-            <div id="step-success" class="hidden booking-section" style="text-align:center;padding:3rem;">
-                <div style="font-size:3.5rem;color:var(--success);margin-bottom:1rem;"><i
-                        class="fas fa-check-circle"></i></div>
-                <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:0.5rem;">Booking Confirmed!</h3>
-                <p style="color:rgba(240,240,240,0.68);margin-bottom:1rem;">Your booking code: <strong id="booking-code"
-                        class="text-accent"></strong></p>
-                <p style="color:rgba(240,240,240,0.68);font-size:0.88rem;margin-bottom:2rem;">We will call you to
-                    confirm the slot. See you soon.</p>
-                <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-                    <a href="/cust_dashboard.html" class="btn btn-primary">My Bookings</a>
-                    <a href="/index.html" class="btn btn-secondary">Back to Home</a>
+        <!-- Right Side: Suggestions (Service Cards) -->
+        <div class="booking-suggestions" style="flex: 1 1 320px; max-width: 400px; position: sticky; top: 120px;">
+            <h3
+                style="font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 1rem; padding-left: 0.5rem; font-family: var(--font-display);">
+                Service Suggestions</h3>
+            <div class="service-cards"
+                style="display: flex; flex-direction: column; gap: 1rem; grid-template-columns: 1fr;">
+                <div class="service-card" data-service="General Service" data-price="599">
+                    <h4>General Service</h4>
+                    <p>Full health check, oil change, tune-up, consumables, and riding‑performance inspection.</p>
+                    <span class="price">Starting ₹599</span>
                 </div>
+                <div class="service-card" data-service="Engine Overhaul" data-price="3999">
+                    <h4>Engine Overhaul</h4>
+                    <p>Compression testing, tear‑downs, rebuilds, and precision replacement for serious mechanical
+                        recovery.</p>
+                    <span class="price">Starting ₹3999</span>
+                </div>
+                <div class="service-card" data-service="Tyres and Brakes" data-price="299">
+                    <h4>Tyres and Brakes</h4>
+                    <p>Grip, stopping power, balancing, pad swaps, and brake servicing tuned for safer aggressive
+                        riding.</p>
+                    <span class="price">Starting ₹299</span>
+                </div>
+                <div class="service-card" data-service="Electrical and Wiring" data-price="199">
+                    <h4>Electrical and Wiring</h4>
+                    <p>Battery diagnostics, charging systems, lighting, wiring recovery, and electrical fault tracing.
+                    </p>
+                    <span class="price">Starting ₹199</span>
+                </div>
+                <div class="service-card" data-service="Suspension Setup" data-price="799">
+                    <h4>Suspension Setup</h4>
+                    <p>Fork servicing, shock tuning, and chassis corrections for sharper confidence in every corner.</p>
+                    <span class="price">Starting ₹799</span>
+                </div>
+                <div class="service-card" data-service="Bodywork and Paint" data-price="1499">
+                    <h4>Bodywork and Paint</h4>
+                    <p>Dent repair, restoration, detailing, and custom finishes that make your bike feel showroom fresh.
+                    </p>
+                    <span class="price">Starting ₹1499</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom: Other Things -->
+    <div class="bottom-stats" style="max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem;">
+        <div class="overview-summary" style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
+            <div class="queue-status card qt-card" style="margin: 0; flex: 1 1 260px;">
+                <div class="qt-label"><i class="fas fa-clipboard-list"></i> Queue</div>
+                <strong id="q-open">0 open bookings</strong>
+                <p id="q-details">0 waiting intake, 0 approved, 0 on the floor.</p>
+            </div>
+            <div class="team-status card qt-card" style="margin: 0; flex: 1 1 260px;">
+                <div class="qt-label"><i class="fas fa-users-cog"></i> Team Status</div>
+                <strong id="t-avail">0 mechanics available</strong>
+                <p id="t-details">0 busy and 0 off duty right now.</p>
             </div>
         </div>
     </div>

@@ -145,35 +145,32 @@
                     </div>
                 </div>
             </section>
-            <div class="stats-grid">
+            <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;">
+                <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> New Booking</a>
+                <a href="/shop.html" class="btn btn-secondary"><i class="fas fa-store"></i> Shop Parts</a>
+            </div>
 
-
-                <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;">
-                    <a href="/booking.html" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> New Booking</a>
-                    <a href="/shop.html" class="btn btn-secondary"><i class="fas fa-store"></i> Shop Parts</a>
-                </div>
-
-                <div class="table-section">
-                    <div class="table-section-header">
-                        <h3>My Bookings</h3>
-                        <div style="display:flex;gap:0.5rem;">
-                            <select id="status-filter" onchange="filterBookings()"
-                                style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text);padding:10px 12px;border-radius:14px;font-size:0.82rem;outline:none;">
-                                <option value="all">All Status</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Confirmed">Confirmed</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="bookings-list">
-                        <div class="loading-center">
-                            <div class="spinner"></div>
-                        </div>
+            <div class="table-section">
+                <div class="table-section-header">
+                    <h3>My Bookings</h3>
+                    <div style="display:flex;gap:0.5rem;">
+                        <select id="status-filter" onchange="filterBookings()"
+                            style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text);padding:10px 12px;border-radius:14px;font-size:0.82rem;outline:none;">
+                            <option value="all">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
                     </div>
                 </div>
+                <div id="bookings-list">
+                    <div class="loading-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
