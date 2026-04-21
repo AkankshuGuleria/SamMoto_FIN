@@ -36,7 +36,8 @@ connectDB();
 app.use(helmet({
     contentSecurityPolicy: false,   // off — inline scripts used in HTML pages
     crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: false  // allow Google Sign-In popups to return to main window
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }, // required for Google Sign-In
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }    // required for Google Sign-In
 }));
 
 // ── CORS — restrict to same origin in production ───────────────────────────
