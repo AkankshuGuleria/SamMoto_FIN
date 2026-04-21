@@ -25,6 +25,8 @@ const bookingSchema = new mongoose.Schema({
     serviceDate: { type: Date, required: true },
     serviceTime: { type: String, default: '10:00' },
     notes: { type: String, default: '' },
+    problemDescription: { type: String, default: '' },
+    attachedImage: { type: String, default: '' },
 
     items: [bookingItemSchema],
     subtotal: { type: Number, default: 0 },

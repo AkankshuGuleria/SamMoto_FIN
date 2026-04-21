@@ -85,60 +85,7 @@
                         <div class="form-row">
                             <div class="input-group">
                                 <label>Bike Model</label>
-                                <select id="bikeModel" onchange="toggleOtherBike()">
-                                    <option value="" disabled selected>Select your bike</option>
-                                    <optgroup label="Royal Enfield">
-                                        <option>RE Classic 350</option>
-                                        <option>RE Bullet 350</option>
-                                        <option>RE Meteor 350</option>
-                                        <option>RE Hunter 350</option>
-                                        <option>RE Himalayan 450</option>
-                                        <option>RE Interceptor 650</option>
-                                    </optgroup>
-                                    <optgroup label="KTM">
-                                        <option>KTM Duke 125</option>
-                                        <option>KTM Duke 200</option>
-                                        <option>KTM Duke 390</option>
-                                        <option>KTM RC 390</option>
-                                    </optgroup>
-                                    <optgroup label="Bajaj">
-                                        <option>Bajaj Pulsar 150</option>
-                                        <option>Bajaj Pulsar NS200</option>
-                                        <option>Bajaj Dominar 400</option>
-                                    </optgroup>
-                                    <optgroup label="Yamaha">
-                                        <option>Yamaha R15 V4</option>
-                                        <option>Yamaha MT-15 V2</option>
-                                        <option>Yamaha FZ-S FI</option>
-                                        <option>Yamaha FZ25</option>
-                                    </optgroup>
-                                    <optgroup label="TVS">
-                                        <option>TVS Apache RTR 160 4V</option>
-                                        <option>TVS Apache RTR 200 4V</option>
-                                        <option>TVS Apache RR 310</option>
-                                    </optgroup>
-                                    <optgroup label="Honda">
-                                        <option>Honda Activa 6G</option>
-                                        <option>Honda Activa 125</option>
-                                        <option>Honda CB300R</option>
-                                        <option>Honda Hness CB350</option>
-                                    </optgroup>
-                                    <optgroup label="Hero">
-                                        <option>Hero Splendor Plus</option>
-                                        <option>Hero Xtreme 160R</option>
-                                        <option>Hero Xpulse 200 4V</option>
-                                    </optgroup>
-                                    <optgroup label="Suzuki">
-                                        <option>Suzuki Gixxer</option>
-                                        <option>Suzuki Gixxer SF</option>
-                                        <option>Suzuki Access 125</option>
-                                    </optgroup>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <div class="input-group" id="otherBikeGroup" style="display:none;margin-top:0.75rem;">
-                                    <label>Your Bike Name and Model</label>
-                                    <input type="text" id="otherBikeInput" placeholder="For example Hero Karizma XMR">
-                                </div>
+                                <input type="text" id="bikeModel" placeholder="For example Hero Karizma XMR" required>
                             </div>
                             <div class="input-group">
                                 <label>Registration Number</label>
@@ -163,11 +110,18 @@
                                     <option>Bodywork & Paint</option>
                                     <option>Oil Change Only</option>
                                     <option>Full Overhaul</option>
+                                    <option>Others</option>
                                 </select>
+                                <div class="input-group" id="otherProblemGroup"
+                                    style="display:none;margin-top:0.75rem;">
+                                    <label>Specify Problem</label>
+                                    <input type="text" id="otherProblemInput"
+                                        placeholder="Describe the specific problem">
+                                </div>
                             </div>
                             <div class="input-group">
                                 <label>Preferred Date</label>
-                                <input type="date" id="serviceDate">
+                                <input type="date" id="serviceDate" onclick="if(this.showPicker) this.showPicker();">
                             </div>
                         </div>
                         <div class="input-group">
@@ -183,8 +137,12 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label>Additional Notes</label>
+                            <label>Additional Notes / Specify Problem</label>
                             <textarea id="notes" placeholder="Describe any specific issues or requests..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Attach Image (Optional)</label>
+                            <input type="file" id="problemImage" accept="image/*" onchange="window.encodeImage(this)">
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="goStep2()">
@@ -224,17 +182,15 @@
                         <div id="booking-summary" style="font-size:0.9rem;line-height:2;"></div>
                     </div>
                     <div class="booking-section">
-                        <h4><i class="fas fa-credit-card text-accent"></i> Payment</h4>
-                        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.75rem;">
-                            <button id="pay-online-btn" class="btn btn-primary" onclick="payOnline()">
-                                <i class="fas fa-mobile-alt"></i> Pay Online (Razorpay)
-                            </button>
-                            <button id="pay-later-btn" class="btn btn-secondary" onclick="bookNow('pay_later')">
-                                <i class="fas fa-store"></i> Pay at Workshop
+                        <h4><i class="fas fa-check-circle text-accent"></i> Confirm Request</h4>
+                        <div style="display:grid;grid-template-columns:1fr;gap:0.75rem;margin-top:1rem;">
+                            <button id="pay-later-btn" class="btn btn-primary" onclick="bookNow('pay_later')">
+                                <i class="fas fa-paper-plane"></i> Submit Booking Request
                             </button>
                         </div>
                         <p style="font-size:0.78rem;color:rgba(240,240,240,0.68);margin-top:0.75rem;">
-                            <i class="fas fa-shield-halved text-accent"></i> Payments secured by Razorpay.
+                            <i class="fas fa-info-circle text-accent"></i> This request will be sent to the workshop
+                            without any upfront charges. Prices shown are for estimates.
                         </p>
                     </div>
                     <button class="btn btn-secondary btn-sm" onclick="goStep(2)"><i class="fas fa-arrow-left"></i>
@@ -333,10 +289,17 @@
 
         function getCart() { return JSON.parse(localStorage.getItem('sm_cart') || '[]'); }
 
-        function toggleOtherBike() {
-            const val = document.getElementById('bikeModel').value;
-            document.getElementById('otherBikeGroup').style.display = val === 'Other' ? 'block' : 'none';
-        }
+        window.base64Image = '';
+        window.encodeImage = function (element) {
+            const file = element.files[0];
+            const reader = new FileReader();
+            reader.onloadend = function () { window.base64Image = reader.result; };
+            if (file) { reader.readAsDataURL(file); }
+        };
+
+        document.getElementById('serviceType').addEventListener('change', function () {
+            document.getElementById('otherProblemGroup').style.display = this.value === 'Others' ? 'block' : 'none';
+        });
 
         function goStep(n) {
             [1, 2, 3].forEach(i => {
@@ -347,10 +310,11 @@
 
         function goStep2() {
             const bike = document.getElementById('bikeModel').value;
-            if (!bike) { showToast('Please select your bike model.', 'error'); return; }
-            if (bike === 'Other' && !document.getElementById('otherBikeInput').value.trim()) { showToast('Please write your bike name.', 'error'); return; }
+            if (!bike.trim()) { showToast('Please enter your bike model.', 'error'); return; }
             if (!document.getElementById('regNumber').value.trim()) { showToast('Please enter your registration number.', 'error'); return; }
-            if (!document.getElementById('serviceType').value) { showToast('Please select a service type.', 'error'); return; }
+            const sType = document.getElementById('serviceType').value;
+            if (!sType) { showToast('Please select a service type.', 'error'); return; }
+            if (sType === 'Others' && !document.getElementById('otherProblemInput').value.trim()) { showToast('Please specify the problem.', 'error'); return; }
             if (!document.getElementById('serviceDate').value) { showToast('Please choose a service date.', 'error'); return; }
             renderCartReview();
             goStep(2);
@@ -390,7 +354,7 @@
 
             document.getElementById('booking-summary').innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-            <span style="color:var(--muted-2);">Bike</span><span>${document.getElementById('bikeModel').value === 'Other' ? document.getElementById('otherBikeInput').value : document.getElementById('bikeModel').value}</span>
+            <span style="color:var(--muted-2);">Bike</span><span>${document.getElementById('bikeModel').value}</span>
             <span style="color:var(--muted-2);">Reg. No.</span><span>${document.getElementById('regNumber').value.toUpperCase()}</span>
             <span style="color:var(--muted-2);">Service</span><span>${document.getElementById('serviceType').value}</span>
             <span style="color:var(--muted-2);">Date</span><span>${(() => { const [y, m, d] = document.getElementById('serviceDate').value.split('-'); return new Date(+y, +m - 1, +d).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }); })()}</span>
@@ -405,12 +369,14 @@
             let partsCost = 0, laborCost = 0;
             cart.forEach(i => { const p = parseFloat(i.price) * (i.qty || 1); if (i.type === 'part') partsCost += p; else laborCost += p; });
             return {
-                bikeModel: document.getElementById('bikeModel').value === 'Other' ? document.getElementById('otherBikeInput').value : document.getElementById('bikeModel').value,
+                bikeModel: document.getElementById('bikeModel').value,
                 registrationNumber: document.getElementById('regNumber').value.toUpperCase(),
                 serviceType: document.getElementById('serviceType').value,
                 serviceDate: document.getElementById('serviceDate').value,
                 serviceTime: document.getElementById('serviceTime').value,
                 notes: document.getElementById('notes').value,
+                problemDescription: document.getElementById('serviceType').value === 'Others' ? document.getElementById('otherProblemInput').value : '',
+                attachedImage: window.base64Image,
                 items: cart,
                 subtotal: partsCost,
                 laborCost: laborCost,
@@ -443,59 +409,7 @@
             }
         }
 
-        async function payOnline() {
-            const payload = buildPayload();
-            const btn = document.getElementById('pay-online-btn');
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening payment...';
 
-            try {
-                const bRes = await fetch('/api/bookings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
-                    body: JSON.stringify(payload)
-                });
-                const bData = await bRes.json();
-                if (!bRes.ok) { showToast(bData.message || 'Booking error.', 'error'); return; }
-
-                const bookingId = bData.booking._id;
-                const total = payload.totalAmount;
-
-                if (total <= 0) { await completeBooking(bookingId, null, null); return; }
-
-                const oRes = await fetch('/api/payments/create-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
-                    body: JSON.stringify({ amount: total, bookingId })
-                });
-                const oData = await oRes.json();
-                if (!oRes.ok) { showToast('Payment gateway error. Pay at workshop instead.', 'error'); return; }
-
-                const auth = Auth.getAuth();
-                const options = {
-                    key: oData.keyId,
-                    amount: oData.amount,
-                    currency: oData.currency,
-                    name: 'SamMoto',
-                    description: payload.serviceType,
-                    order_id: oData.orderId,
-                    prefill: { name: auth.name, email: auth.email },
-                    theme: { color: '#e63946' },
-                    handler: async (response) => {
-                        await fetch('/api/payments/verify', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeader() },
-                            body: JSON.stringify(response)
-                        });
-                        await completeBooking(bookingId, response.razorpay_payment_id, oData.orderId);
-                    }
-                };
-                new Razorpay(options).open();
-            } catch (err) {
-                showToast('Payment error. Try paying at the workshop.', 'error');
-            } finally {
-                btn.disabled = false; btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Pay Online (Razorpay)';
-            }
-        }
 
         async function completeBooking(bookingId, paymentId, orderId) {
             if (paymentId) {

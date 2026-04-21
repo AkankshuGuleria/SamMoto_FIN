@@ -48,7 +48,8 @@
         <a href="/index.html" class="nav-logo">SAM<span>MOTO</span></a>
         <div></div>
         <div class="nav-right">
-            <span style="color:var(--accent);font-size:0.82rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;">Admin</span>
+            <span
+                style="color:var(--accent);font-size:0.82rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;">Admin</span>
             <button onclick="Auth.logout()" class="btn-nav outline">Logout</button>
         </div>
     </nav>
@@ -59,21 +60,31 @@
                 <h3>Update Booking</h3>
                 <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
             </div>
-            <p style="color:rgba(240,240,240,0.68);font-size:0.88rem;margin-bottom:1.25rem;">Booking: <strong id="modal-code"></strong></p>
+            <p style="color:rgba(240,240,240,0.68);font-size:0.88rem;margin-bottom:1.25rem;">Booking: <strong
+                    id="modal-code"></strong></p>
+            <div id="modal-details"
+                style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; display: none;">
+            </div>
             <div class="input-group">
                 <label>Status</label>
                 <select id="modal-status">
-                    <option>Pending</option><option>Confirmed</option>
-                    <option>In Progress</option><option>Completed</option><option>Cancelled</option>
+                    <option>Pending</option>
+                    <option>Confirmed</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                    <option>Cancelled</option>
                 </select>
             </div>
             <div class="input-group">
                 <label>Assign Mechanic</label>
-                <select id="modal-mechanic"><option value="">Unassigned</option></select>
+                <select id="modal-mechanic">
+                    <option value="">Unassigned</option>
+                </select>
             </div>
             <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;">
                 <button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" style="flex:1;" onclick="saveStatus()"><i class="fas fa-save"></i> Save</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="saveStatus()"><i class="fas fa-save"></i>
+                    Save</button>
             </div>
         </div>
     </div>
@@ -84,29 +95,44 @@
             <div class="sidebar-section">Overview</div>
             <a href="/admindashboard.html" class="sidebar-link"><i class="fas fa-gauge"></i> Dashboard</a>
             <div class="sidebar-section">Manage</div>
-            <a href="/admin_bookings.html" class="sidebar-link active"><i class="fas fa-calendar-check"></i> Bookings</a>
+            <a href="/admin_bookings.html" class="sidebar-link active"><i class="fas fa-calendar-check"></i>
+                Bookings</a>
             <a href="/admin_spares.html" class="sidebar-link"><i class="fas fa-boxes-stacked"></i> Inventory</a>
             <a href="/admin_mechanics.html" class="sidebar-link"><i class="fas fa-users-gear"></i> Mechanics</a>
             <a href="#" class="sidebar-link" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </aside>
 
         <main class="dash-main">
-            <div class="dash-header"><h1>Bookings</h1><p>Manage all service bookings through a live workshop queue.</p></div>
+            <div class="dash-header">
+                <h1>Bookings</h1>
+                <p>Manage all service bookings through a live workshop queue.</p>
+            </div>
 
             <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;align-items:center;">
-                <select id="filter-status" onchange="applyFilter()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text);padding:10px 12px;border-radius:14px;font-size:0.85rem;outline:none;">
+                <select id="filter-status" onchange="applyFilter()"
+                    style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text);padding:10px 12px;border-radius:14px;font-size:0.85rem;outline:none;">
                     <option value="all">All Status</option>
-                    <option>Pending</option><option>Confirmed</option><option>In Progress</option><option>Completed</option><option>Cancelled</option>
+                    <option>Pending</option>
+                    <option>Confirmed</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                    <option>Cancelled</option>
                 </select>
                 <div style="position:relative;flex:1;min-width:200px;">
-                    <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-2);font-size:0.82rem;"></i>
-                    <input type="text" id="search" placeholder="Search code, customer, bike..." oninput="applyFilter()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text);padding:12px 12px 12px 36px;border-radius:14px;font-size:0.85rem;outline:none;">
+                    <i class="fas fa-search"
+                        style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-2);font-size:0.82rem;"></i>
+                    <input type="text" id="search" placeholder="Search code, customer, bike..." oninput="applyFilter()"
+                        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text);padding:12px 12px 12px 36px;border-radius:14px;font-size:0.85rem;outline:none;">
                 </div>
                 <span id="count-label" style="font-size:0.82rem;color:var(--muted-2);"></span>
             </div>
 
             <div class="table-section">
-                <div id="bookings-table"><div class="loading-center"><div class="spinner"></div></div></div>
+                <div id="bookings-table">
+                    <div class="loading-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -182,18 +208,34 @@
                                 <td style="font-weight:600;">₹${(b.totalAmount || 0).toLocaleString('en-IN')}</td>
                                 <td>${sb(b.status)}</td>
                                 <td>${pb(b.paymentStatus)}</td>
-                                <td><button class="btn btn-secondary btn-sm" onclick="openModal('${b._id}','${b.bookingCode}','${b.status}','${b.mechanic?._id || ''}')"><i class="fas fa-edit"></i></button></td>
+                                <td><button class="btn btn-secondary btn-sm" onclick="openModal('${b._id}')"><i class="fas fa-edit"></i></button></td>
                             </tr>`).join('')}
                         </tbody>
                     </table>
                 </div>`;
         }
 
-        function openModal(id, code, status, mechanicId) {
+        function openModal(id) {
+            const b = allBookings.find(x => x._id === id);
+            if (!b) return;
             editingId = id;
-            document.getElementById('modal-code').textContent = code;
-            document.getElementById('modal-status').value = status;
-            document.getElementById('modal-mechanic').value = mechanicId || '';
+            document.getElementById('modal-code').textContent = b.bookingCode;
+            document.getElementById('modal-status').value = b.status;
+            document.getElementById('modal-mechanic').value = b.mechanic?._id || '';
+
+            let detailsHtml = '';
+            if (b.notes) detailsHtml += `<div><strong>Notes:</strong> ${b.notes}</div>`;
+            if (b.problemDescription) detailsHtml += `<div style="margin-top:5px;"><strong>Specific Problem:</strong> ${b.problemDescription}</div>`;
+            if (b.attachedImage) detailsHtml += `<div style="margin-top:5px;"><strong>Attached Image:</strong><br><img src="${b.attachedImage}" style="max-width:100%; max-height:200px; border-radius:5px; margin-top:5px;"></div>`;
+
+            const detailsDiv = document.getElementById('modal-details');
+            if (detailsHtml) {
+                detailsDiv.innerHTML = detailsHtml;
+                detailsDiv.style.display = 'block';
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+
             document.getElementById('status-modal').classList.add('open');
         }
 

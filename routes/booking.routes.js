@@ -42,6 +42,8 @@ router.post('/', verifyToken, async (req, res) => {
         const serviceDate        = req.body.serviceDate;
         const serviceTime        = sanitize(req.body.serviceTime, 10) || '10:00';
         const notes              = sanitize(req.body.notes, 500);
+        const problemDescription = sanitize(req.body.problemDescription, 1000);
+        const attachedImage      = req.body.attachedImage || '';
         const items              = Array.isArray(req.body.items) ? req.body.items.slice(0, 50) : [];
         const subtotal           = Math.max(0, parseFloat(req.body.subtotal) || 0);
         const laborCost          = Math.max(0, parseFloat(req.body.laborCost) || 0);
@@ -61,7 +63,7 @@ router.post('/', verifyToken, async (req, res) => {
             customerEmail: req.user.email,
             customerPhone: req.user.phone || '',
             bikeModel, registrationNumber, serviceType, serviceDate: sDate,
-            serviceTime, notes, items, subtotal, laborCost, totalAmount
+            serviceTime, notes, problemDescription, attachedImage, items, subtotal, laborCost, totalAmount
         });
 
         res.status(201).json({ success: true, booking });
